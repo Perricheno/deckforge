@@ -1,0 +1,12 @@
+[Unit]
+Description=Deckforge: presentations, remote control and live updates (x.perricheno.com)
+After=network.target
+
+[Service]
+WorkingDirectory=/root/vscodew/deckforge
+ExecStart=/usr/bin/python3 /root/vscodew/deckforge/tools/serve.py --port 8191 --auto-pdf
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

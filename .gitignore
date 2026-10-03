@@ -1,0 +1,14 @@
+dist/
+dist.tmp/
+dist.old/
+data/
+.venv/
+*.pdf
+__pycache__/
+assets/fonts/*.woff2
+assets/vendor/element.js
+assets/vendor/dom.js
+assets/vendor/controller-*.js
+assets/vendor/normalize-*.js
+assets/vendor/spring-*.js
+assets/vendor/morphicons-LICENSE
