@@ -264,6 +264,150 @@ register('milestones',{selector:'.ms[data-loop]',
       if(n!==last){items.forEach((it,i)=>it.classList.toggle('hi',i<=n));last=n}}},
   still(box){[...box.querySelectorAll('.ms-i')].forEach(i=>i.classList.add('hi'))}});
 
+
+/* ── scenes: After Effects style compositions ───────────────────────────────────────────
+   <div class="scene" data-loop=14>  ->  layers (.ly) with in/out points on a looping timeline.
+   Every layer is compiled to Web Animations keyframes over the whole loop, so all layers share one clock,
+   the composition repeats seamlessly, and pausing/restarting per slide is exact. Presets: see ENTER / EXIT. */
+const EZ={linear:'linear',inOut:'cubic-bezier(.45,0,.55,1)',out:'cubic-bezier(.22,.61,.36,1)',in:'cubic-bezier(.55,.06,.68,.19)',outCubic:'cubic-bezier(.33,1,.68,1)',
+  inOutCubic:'cubic-bezier(.65,0,.35,1)',outExpo:'cubic-bezier(.16,1,.3,1)',inExpo:'cubic-bezier(.7,0,.84,0)',inOutExpo:'cubic-bezier(.87,0,.13,1)',outBack:'cubic-bezier(.34,1.56,.64,1)'};
+const ENTER={
+  rise:{d:.9,e:'outExpo',from:{y:48,o:0},to:{y:0,o:1}},
+  mask:{d:1,e:'outExpo',from:{yp:112,o:1},to:{yp:0,o:1}},
+  fade:{d:.8,e:'outCubic',from:{o:0},to:{o:1}},
+  pop:{d:.75,e:'outBack',from:{s:.55,o:0},to:{s:1,o:1}},
+  blur:{d:1.1,e:'outCubic',from:{b:16,o:0},to:{b:0,o:1}},
+  slide:{d:.95,e:'outExpo',from:{x:-80,o:0},to:{x:0,o:1}},
+  slider:{d:.95,e:'outExpo',from:{x:80,o:0},to:{x:0,o:1}},
+  drop:{d:.85,e:'outBack',from:{y:-70,o:0},to:{y:0,o:1}},
+  zoom:{d:1.2,e:'outExpo',from:{s:1.3,o:0},to:{s:1,o:1}},
+  wipe:{d:1.1,e:'inOutExpo',from:{cr:100,o:1},to:{cr:0,o:1}},
+  draw:{d:1.6,e:'inOutCubic',from:{o:1},to:{o:1}},
+  none:{d:.01,e:'linear',from:{o:1},to:{o:1}}
+};
+const EXIT={fade:{d:.55,to:{o:0}},rise:{d:.55,to:{y:-36,o:0}},mask:{d:.65,to:{yp:-112,o:1}},shrink:{d:.6,to:{s:.9,o:0}},cut:{d:.05,to:{o:0}},blur:{d:.6,to:{b:14,o:0}},wipe:{d:.8,to:{cl:100,o:1}},zoom:{d:.7,to:{s:1.2,o:0}}};
+const kf=(st,extra={})=>{
+  const f={transform:`translate(${st.x||0}px,${st.y||0}px) translateY(${st.yp||0}%) rotate(${st.r||0}deg) scale(${st.s??1})`,opacity:st.o??1,filter:`blur(${st.b||0}px)`,...extra};
+  if(st.cl!=null||st.cr!=null)f.clipPath=`inset(0 ${st.cr||0}% 0 ${st.cl||0}%)`;return f};
+const clampOff=arr=>{let last=-1;for(const k of arr){k.offset=Math.min(1,Math.max(k.offset,last+1e-5));last=k.offset}return arr};
+function enterExit(el,spec,loop,delay){
+  const en=ENTER[spec.in||'rise']||ENTER.rise,ex=EXIT[spec.outAnim||'fade']||EXIT.fade;
+  const at=(spec.at||0)+delay,d=spec.dur||en.d;let out=spec.out??(loop-ex.d-.25);out=Math.max(out,at+d+.15);
+  const hid=kf(en.from),shn=kf(en.to),gone=kf({...en.to,...ex.to});
+  const keys=[{offset:0,...hid},{offset:at/loop,...hid,easing:EZ[en.e]},{offset:(at+d)/loop,...shn,easing:EZ.inOut},{offset:out/loop,...shn,easing:EZ.inOut},{offset:(out+ex.d)/loop,...gone},{offset:1,...gone}];
+  return el.animate(clampOff(keys),{duration:loop*1000,iterations:Infinity,fill:'both'});
+}
+function keyAnim(el,keys,loop){
+  keys=[...keys].sort((a,b)=>a.t-b.t);if(!keys.length)return null;
+  if(keys[0].t>0)keys.unshift({...keys[0],t:0});if(keys[keys.length-1].t<loop)keys.push({...keys[0],t:loop,ease:'inOut'});
+  const kfs=keys.map(k=>({offset:k.t/loop,...kf(k),easing:EZ[k.ease||'inOut']}));
+  return el.animate(clampOff(kfs),{duration:loop*1000,iterations:Infinity,fill:'both'});
+}
+function drawAnim(path,spec,loop){
+  path.setAttribute('pathLength','1');path.style.strokeDasharray='1';
+  const at=spec.at||0,d=spec.dur||(ENTER.draw.d),ex=EXIT[spec.outAnim||'fade']||EXIT.fade;let out=spec.out??(loop-ex.d-.25);out=Math.max(out,at+d+.15);
+  const fillTo=getComputedStyle(path).fillOpacity;
+  const k=[{offset:0,strokeDashoffset:1,fillOpacity:0},{offset:at/loop,strokeDashoffset:1,fillOpacity:0,easing:EZ.inOutCubic},{offset:(at+d)/loop,strokeDashoffset:0,fillOpacity:0,easing:EZ.out},
+    {offset:Math.min(1,(at+d+.6)/loop),strokeDashoffset:0,fillOpacity:fillTo||1},{offset:out/loop,strokeDashoffset:0,fillOpacity:fillTo||1},{offset:Math.min(1,(out+ex.d)/loop),strokeDashoffset:0,fillOpacity:fillTo||1},{offset:1,strokeDashoffset:0,fillOpacity:fillTo||1}];
+  return path.animate(clampOff(k),{duration:loop*1000,iterations:Infinity,fill:'both'});
+}
+const sceneClock=new WeakMap();   // scene -> {t0, loop}
+const sceneTime=sc=>{const c=sceneClock.get(sc);return c?((performance.now()-c.t0)/1000)%c.loop:0};
+register('scene',{selector:'.scene',
+  setup(sc,A){
+    const loop=+sc.dataset.loop||12,anims=[],idx=slideOf(sc);
+    sceneClock.set(sc,{t0:performance.now(),loop});
+    const cam=sc.dataset.camera?JSON.parse(sc.dataset.camera):[];
+    const world=sc.querySelector('.world');if(cam.length){const a=keyAnim(world,cam,loop);if(a)anims.push(a)}
+    for(const ly of sc.querySelectorAll('.ly')){
+      const spec=JSON.parse(ly.dataset.ly||'{}'),inw=ly.querySelector('.inw'),pcs=[...ly.querySelectorAll('.pc')];
+      if(spec.anim&&spec.anim.length){const a=keyAnim(ly,spec.anim,loop);if(a)anims.push(a)}
+      if(spec.in==='draw'||spec.draw){
+        const paths=[...ly.querySelectorAll(spec.drawSel||'.drw')];paths.forEach(p=>anims.push(drawAnim(p,spec,loop)));
+        const ex=EXIT[spec.outAnim||'fade']||EXIT.fade;let out=spec.out??(loop-ex.d-.25);
+        if(spec.in!=='draw'){anims.push(enterExit(inw,spec,loop,0))}
+        else anims.push(enterExit(inw,{...spec,in:'none',at:0,out},loop,0));
+        continue;
+      }
+      if(pcs.length){pcs.forEach((p,i)=>anims.push(enterExit(p,spec,loop,i*(spec.stagger||0))));}
+      else anims.push(enterExit(inw,spec,loop,0));
+    }
+    sc.__anims=anims;
+    const restart=()=>{sceneClock.set(sc,{t0:performance.now(),loop});anims.forEach(a=>{a.currentTime=0;a.play()})};
+    const stop=()=>anims.forEach(a=>a.pause());
+    document.addEventListener('deck:slide',e=>{e.detail.index===idx?restart():stop()});
+    // counters and morphing icons follow the same clock
+    const cnts=[...sc.querySelectorAll('.cnt')],icons=[...sc.querySelectorAll('morph-icon[data-seq]')];
+    icons.forEach(el=>{el.__seq=JSON.parse(el.dataset.seq||'[]');el.__i=-1;el.__first=el.dataset.i});
+    let prev=0;
+    return t=>{
+      const st=sceneTime(sc),wrapped=st<prev;prev=st;
+      for(const c of cnts){const from=+c.dataset.from,to=+c.dataset.to,at=+c.dataset.at,d=+c.dataset.cdur,dec=+c.dataset.dec;
+        const k=A.ease((st-at)/d);c.querySelector('.cnv').textContent=(from+(to-from)*k).toFixed(dec)}
+      for(const el of icons){
+        if(wrapped&&el.__i>=0){el.__i=-1;el.set(A.I[el.__first])}
+        let n=-1;el.__seq.forEach((q,i)=>{if(st>=q.at)n=i});
+        if(n!==el.__i&&n>=0){el.__i=n;el.morphTo(A.I[el.__seq[n].to],'smooth')}}
+    }},
+  still(sc,A){
+    const loop=+sc.dataset.loop||12,poster=+sc.dataset.poster||loop*.55;
+    const cam=sc.dataset.camera?JSON.parse(sc.dataset.camera):[];const world=sc.querySelector('.world');const anims=[];
+    if(cam.length){const a=keyAnim(world,cam,loop);if(a)anims.push(a)}
+    for(const ly of sc.querySelectorAll('.ly')){
+      const spec=JSON.parse(ly.dataset.ly||'{}'),inw=ly.querySelector('.inw'),pcs=[...ly.querySelectorAll('.pc')];
+      if(spec.anim&&spec.anim.length){const a=keyAnim(ly,spec.anim,loop);if(a)anims.push(a)}
+      if(spec.in==='draw'||spec.draw){[...ly.querySelectorAll(spec.drawSel||'.drw')].forEach(p=>anims.push(drawAnim(p,spec,loop)));const ex=EXIT[spec.outAnim||'fade']||EXIT.fade;anims.push(enterExit(inw,{...spec,in:spec.in==='draw'?'none':spec.in,at:spec.in==='draw'?0:spec.at},loop,0));continue}
+      if(pcs.length)pcs.forEach((p,i)=>anims.push(enterExit(p,spec,loop,i*(spec.stagger||0))));else anims.push(enterExit(inw,spec,loop,0));
+    }
+    anims.forEach(a=>{a.pause();a.currentTime=poster*1000});
+    sc.querySelectorAll('.cnt').forEach(c=>{c.querySelector('.cnv').textContent=(+c.dataset.to).toFixed(+c.dataset.dec||0)});
+    sc.querySelectorAll('morph-icon[data-seq]').forEach(el=>{const seq=JSON.parse(el.dataset.seq||'[]');let n=-1;seq.forEach((q,i)=>{if(poster>=q.at)n=i});if(n>=0)el.icon=A.I[seq[n].to]});
+  }});
+
+
+/* map signal: waves leave the head office and light each city when they reach it (a decision travelling the country) */
+register('signal',{selector:'.map[data-signal]',
+  setup(box,A){
+    const svg=box.querySelector('svg'),hq=svg.querySelector('.city.hq .pt');if(!hq)return;
+    const cx=+hq.getAttribute('cx'),cy=+hq.getAttribute('cy'),cities=[...svg.querySelectorAll('.city:not(.hq)')].map(g=>{const pt=g.querySelector('.pt'),x=+pt.getAttribute('cx'),y=+pt.getAttribute('cy');return{g,d:Math.hypot(x-cx,y-cy),last:-9}});
+    const maxR=Math.max(...cities.map(c=>c.d))*1.12,per=7.5,waves=[0,1].map(()=>{const c=document.createElementNS(NS,'circle');c.setAttribute('cx',cx);c.setAttribute('cy',cy);c.setAttribute('fill','none');c.setAttribute('stroke','var(--acc)');c.setAttribute('stroke-width','1.4');svg.insertBefore(c,svg.querySelector('.cities'));return c});
+    return t=>{waves.forEach((w,k)=>{const q=((t/per)+k*.5)%1,r=q*maxR;w.setAttribute('r',r);w.setAttribute('stroke-opacity',(1-q)*(1-q)*.8);
+        cities.forEach(c=>{if(Math.abs(r-c.d)<10)c.last=t})});
+      cities.forEach(c=>c.g.classList.toggle('lit',t-c.last<1.3))}},
+  still(box){box.querySelectorAll('.city').forEach(g=>g.classList.add('lit'))}});
+
+/* lags: a cursor sweeps the timeline; every row lights up when it starts to react (the lag becomes visible) */
+register('lags',{selector:'svg.lags',
+  setup(svg,A){
+    const px0=+svg.dataset.px0,px1=+svg.dataset.px1,loop=+svg.dataset.loop||12,cur=svg.querySelector('.lg-cur'),rows=[...svg.querySelectorAll('.lg-row')].map(g=>{const p=g.querySelector('.lg-p');return{g,p,L:p.getTotalLength(),dot:g.querySelector('.lg-dot'),on:+g.dataset.on}});
+    const yAt=(r,x)=>{let a=0,b=r.L;for(let i=0;i<22;i++){const m=(a+b)/2,pt=r.p.getPointAtLength(m);pt.x<x?a=m:b=m}return r.p.getPointAtLength(b)};
+    return t=>{const q=(t/loop)%1,f=A.clamp(q/.78),x=px0+(px1-px0)*A.ease(f),fade=q<.86?1:Math.max(0,1-(q-.86)*7);
+      cur.setAttribute('x1',x);cur.setAttribute('x2',x);cur.style.opacity=fade*.7;
+      rows.forEach(r=>{const pt=yAt(r,x);r.dot.setAttribute('cx',pt.x);r.dot.setAttribute('cy',pt.y);r.dot.style.opacity=fade;r.g.classList.toggle('on',x>=r.on-2&&q<.9)})}},
+  still(svg){svg.querySelectorAll('.lg-row').forEach(g=>{g.classList.add('on');g.querySelector('.lg-dot').style.display='none'});svg.querySelector('.lg-cur').style.display='none'}});
+
+/* journey: a payment goes out through the nodes and the confirmation comes back */
+register('journey',{selector:'svg.journey',
+  setup(svg,A){
+    const nodes=[...svg.querySelectorAll('.jn-node')].map(g=>({g,x:+g.dataset.x,last:-9})),p1=svg.querySelector('.jn-p1'),p2=svg.querySelector('.jn-p2'),st=svg.querySelector('.jn-st'),x0=nodes[0].x,x1=nodes[nodes.length-1].x,go=svg.dataset.go,back=svg.dataset.back,per=9.5;
+    return t=>{const q=(t%per),fw=A.clamp(q/3.8),bk=A.clamp((q-4.6)/3.0),a=A.ease(fw),b=A.ease(bk);
+      const px=x0+(x1-x0)*a,py=x1-(x1-x0)*b;
+      p1.setAttribute('cx',px);p1.style.opacity=q<4.2?1:0;p2.setAttribute('cx',py);p2.style.opacity=(q>4.6&&q<7.9)?1:0;
+      st.textContent=q<4.4?go:(q<8?back:'');st.style.opacity=(q<4.2||(q>4.6&&q<7.9))?1:0;
+      nodes.forEach(n=>{if((q<4.2&&Math.abs(px-n.x)<24)||(q>4.6&&q<7.9&&Math.abs(py-n.x)<24))n.last=t;n.g.classList.toggle('hi',t-n.last<1.0)})}},
+  still(svg){svg.querySelectorAll('.jn-node').forEach(g=>g.classList.add('hi'));svg.querySelector('.jn-p1').style.display='none';svg.querySelector('.jn-p2').style.display='none'}});
+
+/* erosion: the same 100 tenge, year by year, under two inflation rates */
+register('erosion',{selector:'svg.erosion',
+  setup(svg,A){
+    const years=+svg.dataset.years||10,per=+svg.dataset.loop||11,coins=[...svg.querySelectorAll('.er-c')].map(g=>({g,rate:+g.dataset.rate,coin:g.querySelector('.er-coin'),gl:g.querySelector('.er-g'),v:g.querySelector('.er-v'),cx:+g.dataset.cx})),
+      yt=svg.querySelector('.er-y'),mk=svg.querySelector('.er-mk');
+    return t=>{const q=(t/per)%1,y=years*A.ease(A.clamp(q/.82)),R=96;
+      yt.textContent='Year '+Math.round(y);mk.setAttribute('cx',310+100*y/years);
+      coins.forEach(c=>{const v=100/Math.pow(1+c.rate/100,y),r=R*Math.sqrt(v/100);c.coin.setAttribute('r',r);c.gl.setAttribute('transform',`translate(${c.cx} 140) scale(${Math.max(.25,r/R)})`);c.v.textContent=Math.round(v)})}},
+  still(svg){const y=+svg.dataset.years||10;svg.querySelector('.er-y').textContent='Year '+y;svg.querySelector('.er-mk').setAttribute('cx',410);
+    svg.querySelectorAll('.er-c').forEach(g=>{const rate=+g.dataset.rate,v=100/Math.pow(1+rate/100,y),r=96*Math.sqrt(v/100),cx=+g.dataset.cx;g.querySelector('.er-coin').setAttribute('r',r);g.querySelector('.er-g').setAttribute('transform',`translate(${cx} 140) scale(${Math.max(.25,r/96)})`);g.querySelector('.er-v').textContent=Math.round(v)})}});
+
 /* ── frame loop ────────────────────────────────────────────────────────── */
 boot(Object.values(behaviors));
 window.__deckBooted=true;

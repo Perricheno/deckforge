@@ -367,7 +367,7 @@ def b_map(b):
         lat, lon = KZ_CITIES[p] if isinstance(p, str) else (p["lat"], p["lon"])
         pts[n] = proj(lat, lon)
     hq = b.get("hq")
-    out = [f'<path class="mp-land" d="{g["path"]}"/>']
+    out = [f'<path class="mp-land drw" d="{g["path"]}"/>']
     if b.get("graticule", True):
         gr = []
         for lon in range(50, 90, 10):
@@ -395,7 +395,9 @@ def b_map(b):
         city.append(f'<g class="city{" hq" if n == hq else ""}"><circle class="ring" cx="{x:.1f}" cy="{y:.1f}" r="{9 if n == hq else 6}"/><circle class="pt" cx="{x:.1f}" cy="{y:.1f}" r="{5.5 if n == hq else 3.6}"/>{lab}</g>')
     cyc = " data-cycle" if b.get("cycle") else ""
     out.append(f'<g class="cities"{cyc}>{"".join(city)}</g>')
-    return f'<div class="map"><svg viewBox="0 0 {g["w"]} {g["h"]}" role="img" aria-label="Map of Kazakhstan">{"".join(out)}</svg></div>'
+    sig = ' data-signal="1"' if b.get("signal") else ""
+    ls = f' style="--lab:{b["label_size"]}px"' if b.get("label_size") else ""
+    return f'<div class="map"{sig}><svg viewBox="0 0 {g["w"]} {g["h"]}"{ls} role="img" aria-label="Map of Kazakhstan">{"".join(out)}</svg></div>'
 
 def b_dial(b):
     """Gauge with a needle that breathes. value 0..1 (illustrative), label under it."""
@@ -425,6 +427,99 @@ def b_morphline(b):
 
 def b_bigtype(b):
     return f'<p class="bigtype kin">{kinetic(b["t"])}</p>'
+
+import math, textwrap
+
+def _wrap(t, w=22):
+    return textwrap.wrap(t, w) or [""]
+
+def b_lags(b):
+    """Impulse-response chart: a decision at t0 travels through the economy with lags.
+    rows:[{t,d,kind:"step"|"rise"|"fall",delay,tau,acc?}]; a cursor sweeps time and lights each row when it starts to react."""
+    W, H, px0, px1, rh, gap, top = 660, 372, 196, 640, 52, 14, 30
+    t0 = b.get("shock", .14)
+    X = lambda f: px0 + f * (px1 - px0)
+    rows, labels = [], []
+    for i, r in enumerate(b["rows"]):
+        y0 = top + i * (rh + gap); lo, hi = y0 + rh - 6, y0 + 6
+        kind, delay, tau = r.get("kind", "rise"), r.get("delay", 0), r.get("tau", .1)
+        if kind == "step":
+            pts = [(0, 0), (t0, 0), (t0, 1), (1, 1)]
+        else:
+            pts = []
+            for k in range(121):
+                x = k / 120
+                v = 0 if x <= t0 + delay else 1 - math.exp(-(x - t0 - delay) / tau)
+                pts.append((x, v))
+        yy = (lambda v, lo=lo, hi=hi: hi + (lo - hi) * v) if kind == "fall" else (lambda v, lo=lo, hi=hi: lo - (lo - hi) * v)
+        d = "M" + "L".join(f"{X(x):.1f} {yy(v):.1f}" for x, v in pts)
+        onset = X(t0 + (0 if kind == "step" else delay))
+        nm = "".join(f'<text class="lg-d" x="0" y="{y0 + 33 + 14*j:.0f}">{esc(l)}</text>' for j, l in enumerate(_wrap(r.get("d", ""), 44)[:1]))
+        rows.append(f'<g class="lg-row{" acc" if r.get("acc") else ""}" data-on="{onset:.1f}"><line class="lg-base" x1="{px0}" x2="{px1}" y1="{lo+6}" y2="{lo+6}"/>'
+                    f'<text class="lg-n" x="0" y="{y0 + 20:.0f}">{rich(r["t"])}</text>{nm}<path class="lg-p" d="{d}"/><circle class="lg-dot" r="5" cx="{px0}" cy="{lo}"/></g>')
+    shock = (f'<line class="lg-shock" x1="{X(t0):.1f}" x2="{X(t0):.1f}" y1="{top-8}" y2="{H-34}"/>'
+             f'<text class="lg-sk" x="{X(t0)+8:.1f}" y="{top-14}">{esc(b.get("shock_label","Decision"))}</text>')
+    ticks = "".join(f'<text class="lg-tk" x="{X(f):.1f}" y="{H-12}" text-anchor="middle">{esc(l)}</text>' for f, l in b.get("ticks", [(.14, "Day 0"), (.34, "Weeks"), (.6, "Months"), (.9, "Quarters")]))
+    cur = f'<line class="lg-cur" x1="{px0}" x2="{px0}" y1="{top-8}" y2="{H-34}"/>'
+    return (f'<div class="lagsw"><svg class="lags" viewBox="0 0 {W} {H}" data-px0="{px0}" data-px1="{px1}" data-loop="{b.get("loop",12)}">{shock}{"".join(rows)}{ticks}{cur}</svg>'
+            f'<p class="cap">{rich(b.get("cap",""))}</p></div>')
+
+def _jn_shape(kind):
+    """Hand-drawn 80x80 illustrations, centred on (0,0)."""
+    if kind == "phone":
+        return ('<rect x="-17" y="-32" width="34" height="64" rx="7"/><path d="M-6 -25h12"/><rect x="-10" y="-14" width="8" height="8" rx="1.5"/><rect x="2" y="-14" width="8" height="8" rx="1.5"/>'
+                '<rect x="-10" y="-2" width="8" height="8" rx="1.5"/><path d="M4 -1h6v6M4 9h6M-10 14h20" class="thin"/>')
+    if kind == "bank":
+        return '<path d="M-30 -8 0 -28 30 -8Z"/><path d="M-24 -4v26M-8 -4v26M8 -4v26M24 -4v26"/><path d="M-32 28h64M-28 22h56"/>'
+    if kind == "nbk":
+        return ('<circle r="38" class="thin dash"/><path d="M-26 -10 0 -28 26 -10Z"/><path d="M-20 -6v24M-7 -6v24M7 -6v24M20 -6v24"/><path d="M-28 24h56M-24 18h48"/>'
+                '<path d="M-7 -17h14M-7 -13h14M0 -17v8" class="thin"/>')
+    if kind == "shop":
+        return ('<path d="M-32 -6 -26 -26H26L32 -6C32 2 22 2 22 -6 22 2 11 2 11 -6 11 2 0 2 0 -6 0 2 -11 2 -11 -6 -11 2 -22 2 -22 -6 -22 2 -32 2 -32 -6Z"/>'
+                '<path d="M-26 2V28H26V2"/><rect x="-8" y="10" width="16" height="18" rx="2"/>')
+    return '<circle r="22"/>'
+
+def b_journey(b):
+    """A payment travelling through the system and the confirmation coming back. nodes:[{kind:phone|bank|nbk|shop,t,d}]"""
+    nodes = b["nodes"]
+    W, H = 880, 330
+    xs = [90 + i * (W - 180) / (len(nodes) - 1) for i in range(len(nodes))]
+    cy = 112
+    g = [f'<path class="jn-line" d="M{xs[0]:.0f} {cy}H{xs[-1]:.0f}"/>']
+    for x, n in zip(xs, nodes):
+        cap = "".join(f'<tspan x="{x:.0f}" dy="{14 if j else 0}" class="jn-d">{esc(l)}</tspan>' for j, l in enumerate(_wrap(n.get("d", ""), 24)))
+        g.append(f'<g class="jn-node" data-x="{x:.0f}"><circle class="jn-ring" cx="{x:.0f}" cy="{cy}" r="52"/><g class="jn-ill" transform="translate({x:.0f} {cy})">{_jn_shape(n["kind"])}</g>'
+                 f'<text class="jn-t" x="{x:.0f}" y="{cy+82}" text-anchor="middle">{rich(n["t"])}</text><text x="{x:.0f}" y="{cy+100}" text-anchor="middle">{cap}</text></g>')
+    g.append(f'<circle class="jn-p1" r="6" cx="{xs[0]:.0f}" cy="{cy}"/><circle class="jn-p2" r="5" cx="{xs[-1]:.0f}" cy="{cy}"/>')
+    g.append(f'<text class="jn-st" x="{W/2:.0f}" y="24" text-anchor="middle">{esc(b.get("go","Payment request"))}</text>')
+    return f'<div class="jnw"><svg class="journey" viewBox="0 0 {W} {H}" data-go="{esc(b.get("go","Payment request"))}" data-back="{esc(b.get("back","Confirmation"))}">{"".join(g)}</svg></div>'
+
+def b_erosion(b):
+    """Two coins that shrink year by year: what steady inflation does to 100 tenge. rates:[5,10], years:10"""
+    ra, rb = b.get("rates", [5, 10])
+    W, H, R = 720, 330, 96
+    def coin(cx, label, rate, col):
+        return (f'<g class="er-c" data-cx="{cx}" data-rate="{rate}"><circle class="er-ring" cx="{cx}" cy="140" r="{R}" style="stroke:{col}"/>'
+                f'<circle class="er-coin" cx="{cx}" cy="140" r="{R}" style="stroke:{col}"/>'
+                f'<g class="er-g" transform="translate({cx} 140)"><path d="M-28 -20H28M-28 -4H28M0 -20V36" style="stroke:{col}"/></g>'
+                f'<text class="er-v" x="{cx}" y="274" text-anchor="middle">100</text><text class="er-l" x="{cx}" y="300" text-anchor="middle">{esc(label)}</text></g>')
+    return (f'<div class="erw"><svg class="erosion" viewBox="0 0 {W} {H}" data-years="{b.get("years",10)}" data-loop="{b.get("loop",11)}" data-ra="{ra}" data-rb="{rb}">'
+            f'{coin(135, f"{ra}% inflation a year", ra, "var(--acc)")}{coin(585, f"{rb}% inflation a year", rb, "var(--ink)")}'
+            f'<text class="er-y" x="360" y="132" text-anchor="middle">Year 0</text><text class="er-s" x="360" y="160" text-anchor="middle">purchasing power of 100 tenge</text>'
+            f'<line class="er-ruler" x1="310" x2="410" y1="190" y2="190"/><circle class="er-mk" cx="310" cy="190" r="4"/></svg>'
+            f'<p class="cap">{rich(b.get("cap",""))}</p></div>')
+
+def b_baiterek(b):
+    """Line illustration: Baiterek, a yurt and a bank under a slow sun. Pure decoration with a story: tradition, state, money."""
+    stars = "".join(f'<circle class="bk-star" cx="{x}" cy="{y}" r="1.8" style="animation-delay:{d}s"/>' for x, y, d in [(60, 90, 0), (130, 40, 1.2), (440, 70, .6), (480, 150, 2), (90, 200, 1.7), (400, 30, 2.6)])
+    lat = "".join(f'<path d="M{262-20+k*2} {470-k*34}L{258+20-k*2} {470-k*34-17}M{258+20-k*2} {470-k*34}L{262-20+k*2} {470-k*34-17}"/>' for k in range(0, 4))
+    return ('<div class="bkw"><svg class="baiterek" viewBox="0 0 520 520"><g data-motion="float:amp=6,per=11"><circle class="bk-sun" cx="408" cy="196" r="84"/><circle class="bk-sun2" cx="408" cy="196" r="108"/></g>'
+            f'{stars}<path class="bk-ground" d="M0 470H520"/><path class="bk-hills" d="M0 458C70 430 130 452 200 440S330 446 380 436 470 448 520 440"/>'
+            '<g class="bk-t"><path d="M228 470C240 400 248 340 246 300M292 470C280 400 272 340 274 300"/>' + lat +
+            '<path d="M246 300C214 262 222 226 244 214M274 300C306 262 298 226 276 214"/><circle cx="260" cy="168" r="60"/><circle class="bk-in bk-spin" cx="260" cy="168" r="40"/>'
+            '<path d="M260 108V64M254 78h12"/></g>'
+            '<g class="bk-y"><path d="M44 470v-30M128 470v-30M36 440C36 408 62 392 86 392s50 16 50 48M76 386h20M70 470v-24a16 16 0 0 1 32 0v24"/></g>'
+            '<g class="bk-b"><path d="M392 424 428 404 464 424ZM400 428v42M418 428v42M436 428v42M454 428v42M388 470h84"/></g></svg></div>')
 
 BLOCKS = {k[2:]: v for k, v in globals().items() if k.startswith("b_")}
 
@@ -482,6 +577,8 @@ def chrome(i, total, s, deck, body, cls=""):
     active = " active" if i == 0 else ""
     cls = f"lay-{cls}" if cls else ""
     th = f' data-theme="{esc(s["theme"])}"' if s.get("theme") else ""
+    if s.get("chrome") is False:
+        return (f'<section class="slide bare {cls}{active}"{th}>{amb_html(s, deck)}{decor_html(s)}<div class="body">{body}</div></section>')
     return (f'<section class="slide {cls}{active}"{th}>{amb_html(s, deck)}{decor_html(s)}'
             f'<div class="head"><span class="tag">{rich(s.get("tag", deck.get("tag","")))}</span><span>{i+1:02d} / {total:02d}</span></div>'
             f'<div class="body">{body}</div><div class="foot"><span>{foot_l}</span><span>{foot_r}</span></div></section>')
@@ -582,6 +679,112 @@ def L_spotlight(s, deck):
     right = blocks(s.get("right"), 1)
     lead = f'<p class="lead rise" style="--d:1;margin:12px 0 18px">{rich(s["lead"])}</p>' if s.get("lead") else ""
     return (f'<div class="spot" style="--cols:{s.get("cols","340px 1fr")}"><div class="col sl">{title_html(s)}{lead}{left}</div><div class="col sr">{right}</div></div>'), "spotlight"
+
+# ======================================================================================
+# Scene layout: an After Effects style composition. Layers have in/out points on a looping timeline.
+# ======================================================================================
+_TOK = {"ink", "mute", "faint", "acc", "body", "on", "line", "tint", "card"}
+
+def _col(c, default="ink"):
+    c = c or default
+    return f"var(--{c})" if c in _TOK else c
+
+def _runs(text):
+    """Split markup (*dim*, ^^accent^^, **bold**) into [(text, cls)]."""
+    runs = []
+    for p in re.findall(r"\^\^.+?\^\^|\*\*.+?\*\*|(?<!\*)\*(?!\*).+?(?<!\*)\*(?!\*)|[^*^]+", str(text)):
+        if p.startswith("^^"): runs.append((p[2:-2], "hl"))
+        elif p.startswith("**"): runs.append((p[2:-2], "b"))
+        elif p.startswith("*"): runs.append((p[1:-1], "dim"))
+        else: runs.append((p, ""))
+    return runs
+
+def _pieces(text, mode, mask):
+    """Text -> html with .pc pieces (chars | words | lines) so the engine can stagger them."""
+    out = []
+    wrap = (lambda h: f'<span class="mw">{h}</span>') if mask else (lambda h: h)
+    if mode == "lines":
+        # each line is one piece; a markup run may continue on the same line
+        for ln in str(text).split("\n"):
+            inner = "".join(f'<span class="{c}">{esc(t, quote=False)}</span>' if c else esc(t, quote=False) for t, c in _runs(ln))
+            out.append(wrap(f'<span class="pc ln">{inner}</span>'))
+        return "<br>".join(out)
+    for li, ln in enumerate(str(text).split("\n")):
+        if li: out.append("<br>")
+        for t, c in _runs(ln):
+            toks = list(t) if mode == "chars" else re.findall(r"\S+|\s+", t)
+            for tok in toks:
+                if tok.isspace(): out.append(" "); continue
+                cls = f"pc {c}".strip()
+                out.append(wrap(f'<span class="{cls}">{esc(tok, quote=False)}</span>'))
+    return "".join(out)
+
+_ANC = {"tl": (0, 0), "tc": (-50, 0), "tr": (-100, 0), "cl": (0, -50), "c": (-50, -50), "cr": (-100, -50), "bl": (0, -100), "bc": (-50, -100), "br": (-100, -100)}
+
+def _ly(l, inner, extra_style="", cls="", draw=False):
+    ax, ay = _ANC[l.get("anchor", "tl")]
+    spec = {k: l[k] for k in ("at", "out", "in", "outAnim", "dur", "stagger", "anim", "draw", "drawSel") if k in l}
+    if draw: spec["draw"] = True
+    z = f"z-index:{l['z']};" if "z" in l else ""
+    fx = f' data-motion="{esc(l["loop"])}"' if l.get("loop") else ""
+    return (f'<div class="ly {cls}" data-ly="{esc(json.dumps(spec))}" style="left:{l.get("x",0)}px;top:{l.get("y",0)}px;{z}">'
+            f'<div class="fxw"{fx}><div class="inw"><div class="anc" style="transform:translate({ax}%,{ay}%);{extra_style}">{inner}</div></div></div></div>')
+
+def ly_text(l):
+    mode = l.get("split") or ("lines" if "\n" in str(l["t"]) and l.get("in") in ("mask", "rise") else "")
+    mask = l.get("in") == "mask"
+    inn = _pieces(l["t"], mode or "words", mask) if (mode or mask) else "".join(f'<span class="{c}">{esc(t, quote=False)}</span>' if c else esc(t, quote=False) for t, c in _runs(l["t"])).replace("\n", "<br>")
+    st = (f'font-size:{l.get("size",40)}px;font-weight:{l.get("weight",600)};letter-spacing:{l.get("spacing",-.035)}em;line-height:{l.get("lh",1.04)};'
+          f'text-align:{l.get("align","left")};color:{_col(l.get("color"))};' + ("text-transform:uppercase;" if l.get("upper") else "") + (f'width:{l["w"]}px;' if l.get("w") else "white-space:pre;"))
+    if mode or mask:
+        l = {**l, "stagger": l.get("stagger", {"chars": .03, "words": .09, "lines": .16}.get(mode or "words", .09))}
+    return _ly(l, inn, st, "ly-text")
+
+def ly_shape(l):
+    k = l.get("shape", "rect"); w, h = l.get("w", 100), l.get("h", 100)
+    sw = l.get("sw", 2); fill = _col(l["fill"]) if l.get("fill") else "none"; stroke = _col(l["stroke"]) if l.get("stroke") else "none"
+    op = f' opacity="{l["opacity"]}"' if l.get("opacity") is not None else ""
+    common = f'fill="{fill}" stroke="{stroke}" stroke-width="{sw}" stroke-linecap="round" stroke-linejoin="round"{op}'
+    draw = bool(l.get("draw"))
+    dr = ' class="drw" pathLength="1"' if draw else ""
+    if k == "rect": el = f'<rect x="{sw/2}" y="{sw/2}" width="{w-sw}" height="{h-sw}" rx="{l.get("r",0)}" {common}{dr}/>'
+    elif k in ("circle", "ring"): el = f'<circle cx="{w/2}" cy="{h/2}" r="{(min(w,h)-sw)/2}" {common}{dr}/>'
+    elif k == "line": el = f'<path d="M0 {h/2}H{w}" {common}{dr}/>'
+    elif k == "plus": el = f'<path d="M{w/2} 0V{h}M0 {h/2}H{w}" {common}{dr}/>'
+    else: el = f'<path d="{l["d"]}" {common}{dr}/>'
+    vb = l.get("vb", f"0 0 {w} {h}")
+    return _ly(l, f'<svg viewBox="{vb}" width="{w}" height="{h}" style="overflow:visible;display:block">{el}</svg>', "", "ly-shape", draw)
+
+def ly_widget(l):
+    st = f'width:{l["w"]}px;' if l.get("w") else ""
+    return _ly(l, render_block(l["block"]), st, "ly-widget")
+
+def ly_icon(l):
+    seq = json.dumps(l.get("seq", []))
+    el = f'<morph-icon data-i="{l["name"]}" data-seq="{esc(seq)}" size="{l.get("size",96)}" stroke-width="{l.get("sw",1.3)}" style="color:{_col(l.get("color"), "acc")}"></morph-icon>'
+    return _ly(l, el, "", "ly-icon")
+
+def ly_counter(l):
+    pre, suf = esc(l.get("prefix", "")), esc(l.get("suffix", ""))
+    st = f'font-size:{l.get("size",64)}px;font-weight:{l.get("weight",600)};letter-spacing:-.04em;line-height:1;color:{_col(l.get("color"), "acc")};font-variant-numeric:tabular-nums;white-space:pre;'
+    el = (f'<span class="cnt" data-from="{l.get("from",0)}" data-to="{l["to"]}" data-at="{l.get("at",0)}" data-cdur="{l.get("cdur",1.8)}" data-dec="{l.get("dec",0)}">'
+          f'{pre}<span class="cnv">{l.get("from",0)}</span>{suf}</span>')
+    return _ly(l, el, st, "ly-counter")
+
+LAYER_TYPES = {"text": ly_text, "shape": ly_shape, "widget": ly_widget, "icon": ly_icon, "counter": ly_counter}
+
+def L_scene(s, deck):
+    """layers:[{type:text|shape|widget|icon|counter, x,y,anchor, at,out,in,outAnim,dur,stagger, anim:[keys], loop:"float:amp=6"}],
+    loop (s), poster (s, still frame for PDF), camera:[{t,s,x,y,ease}]"""
+    loop = s.get("loop", 12)
+    layers = []
+    for i, l in enumerate(s["layers"]):
+        t = l.get("type", "text")
+        if t not in LAYER_TYPES:
+            raise ValueError(f"scene layer {i+1}: unknown type {t!r}; known: {', '.join(LAYER_TYPES)}")
+        layers.append(LAYER_TYPES[t](l))
+    cam = esc(json.dumps(s.get("camera", [])))
+    return (f'<div class="scene" data-loop="{loop}" data-poster="{s.get("poster", round(loop * .55, 2))}" data-camera="{cam}"><div class="world">{"".join(layers)}</div></div>'), "scene"
 
 LAYOUTS = {k[2:]: v for k, v in globals().items() if k.startswith("L_")}
 

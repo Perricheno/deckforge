@@ -16,6 +16,12 @@ You write **content only**: `decks/<slug>/deck.json`. The engine (layouts, block
 6. **Speech.** Use the `deck-speech` skill and save `decks/<slug>/speech.en.md` so the phone remote can show it.
 7. Tell the user the URL, the PIN reminder (`python tools/setpin.py <6 digits>` to change), and list what you invented (numbers, sample sizes) so they can confirm.
 
+## Motion first (the user's brief: After Effects style motion design, everything looped)
+- The user rejected template-looking decks (cards, icon grids, generic charts). Default to **`scene` slides**: kinetic type, drawn-on shapes, camera moves, counters and one explanatory visual per slide that tells a story. Use list/table layouts only when the content truly is a list or a table.
+- Think like a motion designer: storyboard each slide as a 12-18 s loop with in/out points (see the recipe in `reference.md`), vary rhythm and layout between slides, and use a different theme/scene mix per deck so decks do not look alike.
+- Visuals must explain something (relationships, sequence, change over time, geography), not decorate. Prefer the storytelling widgets (`map`, `lags`, `journey`, `erosion`) and `curve`; draw new custom illustrations as inline SVG shapes when needed.
+- Real brands: take the palette from the brand's own site/logo (add a `[data-theme=...]` block), never invent logos.
+
 ## Design rules
 - **Inter only**, weight and size carry hierarchy. One accent colour (`accent` in deck.json to change). Minimal, generous spacing, light theme.
 - **Every slide has something that moves**: a `bg` scene (aurora, grid, waves, orbits, particles), a chart marker, packets/flow connectors, morphing icons, a counter, a ticker, or `decor` shapes. Vary scenes between slides; never put the same scene on every slide.

@@ -1,115 +1,639 @@
 {
-  "title": "National Bank of Kazakhstan",
-  "subtitle": "Perricheno Presentation, Motion Design: the institution behind the tenge, price stability and the payment system.",
-  "authors": [],
-  "date": "2026-10",
-  "tags": ["Motion design", "Kazakhstan"],
-  "minutes": 4,
-  "order": 5,
-  "theme": "nbk",
-  "tag": "National Bank of Kazakhstan",
-  "footer": "Perricheno Presentation · Motion Design",
-  "footer_right": "",
-  "slides": [
+ "title": "National Bank of Kazakhstan",
+ "subtitle": "Perricheno Presentation, Motion Design: the institution behind the tenge, price stability and the payment system.",
+ "authors": [],
+ "date": "2026-10",
+ "tags": [
+  "Motion design",
+  "Kazakhstan"
+ ],
+ "minutes": 4,
+ "order": 5,
+ "theme": "nbk",
+ "tag": "National Bank of Kazakhstan",
+ "footer": "Perricheno Presentation · Motion Design",
+ "footer_right": "",
+ "slides": [
+  {
+   "layout": "scene",
+   "chrome": false,
+   "theme": "nbk-dark",
+   "bg": "steppe",
+   "loop": 14,
+   "poster": 8,
+   "camera": [
     {
-      "layout": "poster", "theme": "nbk-dark", "bg": "steppe",
-      "eyebrow": "Perricheno Presentation · Motion Design",
-      "title": "National Bank of *Kazakhstan*",
-      "sub": "The institution behind the tenge: price stability, financial stability and the payment system.",
-      "left": [{"type": "morphline", "icons": ["tenge", "nbk", "baiterek", "shanyrak", "yurt", "rate"], "size": 36}],
-      "art": [{"type": "map", "points": ["Astana", "Almaty", "Shymkent", "Aktobe", "Atyrau", "Karaganda", "Pavlodar", "Kostanay", "Oskemen", "Aktau"], "hq": "Astana", "arcs": "hub", "labels": "hq", "graticule": true}],
-      "ticker": ["Tenge since 1993", "Free float since 2015", "Inflation targeting", "Digital tenge pilot", "Payment systems", "Financial stability"],
-      "decor": [{"kind": "plus", "x": 55, "y": 12, "size": 20, "motion": "spin:per=30"}, {"kind": "ring", "x": 90, "y": 84, "size": 54, "opacity": 0.5, "motion": "float:amp=8,per=8"}]
+     "t": 0,
+     "s": 1,
+     "x": 0,
+     "y": 0
     },
     {
-      "layout": "spotlight", "n": "1", "theme": "nbk", "bg": "grid", "bg_opts": {"alpha": 0.45},
-      "tag": "Geography", "title": "One country, one currency, *one payment space*",
-      "lead": "From Atyrau to Oskemen, banks and people use the same national currency and the same settlement infrastructure.",
-      "cols": "350px 1fr",
-      "left": [
-        {"type": "bullets", "items": [
-          {"b": "Cash.", "t": "The National Bank issues the tenge and manages banknotes and coins."},
-          {"b": "Payments.", "t": "It oversees payment systems so transfers settle across every region."},
-          {"b": "Stability.", "t": "It works to keep prices and the financial system stable."}]}
-      ],
-      "right": [{"type": "map", "points": ["Astana", "Almaty", "Shymkent", "Aktobe", "Atyrau", "Aktau", "Karaganda", "Pavlodar", "Kostanay", "Oskemen", "Kyzylorda", "Uralsk"], "hq": "Astana", "arcs": "hub", "cycle": true, "graticule": true,
-        "labels": {"Astana": "top", "Atyrau": "left", "Aktau": "left", "Uralsk": "left", "Aktobe": "left", "Kyzylorda": "left", "Shymkent": "left", "Almaty": "bottom", "Oskemen": "bottom", "Pavlodar": "top", "Kostanay": "top", "Karaganda": "right"}}]
+     "t": 7,
+     "s": 1.045,
+     "x": -16,
+     "y": -6
     },
     {
-      "layout": "history", "n": "2", "theme": "nbk-dark", "bg": "waves", "bg_opts": {"y": 0.93, "alpha": 0.8},
-      "tag": "History", "title": "From a new currency to a *floating tenge*",
-      "lead": "Four moments explain how the National Bank works today.", "loop": 15,
-      "events": [
-        {"year": "1991", "icon": "kazakhstan", "title": "Independence", "t": "Kazakhstan starts building its own financial system."},
-        {"year": "1993", "icon": "tenge", "title": "The tenge", "t": "The national currency is introduced on 15 November, marked every year."},
-        {"year": "2015", "icon": "rate", "title": "Free float", "t": "In August the exchange rate begins to float and inflation targeting becomes the framework."},
-        {"year": "2021", "icon": "digitalTenge", "title": "Digital tenge", "t": "The National Bank starts piloting a digital form of the national currency."}
-      ]
-    },
-    {
-      "layout": "spotlight", "n": "3", "theme": "nbk", "bg": "orbits", "bg_opts": {"x": 0.86, "y": 0.2, "alpha": 0.6},
-      "tag": "Monetary policy", "title": "How a rate decision *reaches prices*",
-      "lead": "The base rate is the main instrument. Its effect travels through the economy step by step.",
-      "cols": "380px 1fr",
-      "left": [
-        {"type": "bullets", "items": [
-          {"b": "First,", "t": "the base rate sets the price of money for banks."},
-          {"b": "Then", "t": "rates on loans and deposits follow."},
-          {"b": "Next,", "t": "households and firms adjust spending and borrowing."},
-          {"b": "Finally,", "t": "inflation moves toward the target over time."}]}
-      ],
-      "right": [
-        {"type": "dial", "value": 0.62, "amp": 0.1, "title": "Base rate", "cap": "Illustrative gauge, not the current rate"},
-        {"type": "steps", "items": [
-          {"icon": "rate", "t": "Base rate", "d": "Set by the National Bank"},
-          {"icon": "network", "t": "Money market", "d": "Interbank rates follow"},
-          {"icon": "card", "t": "Loans, deposits", "d": "Bank rates adjust"},
-          {"icon": "inflation", "t": "Prices", "d": "Inflation responds"}]}
-      ]
-    },
-    {
-      "layout": "spotlight", "n": "4", "theme": "nbk-dark", "bg": "particles", "bg_opts": {"count": 38},
-      "tag": "Payments", "title": "Money in every form, *one trusted system*",
-      "lead": "Cash, cards, QR codes and the digital tenge run on shared rules and shared infrastructure.",
-      "cols": "330px 1fr",
-      "left": [{"type": "note", "icon": "shieldTenge", "t": "Oversight and clear rules keep payments safe, so trust in the tenge does not depend on the payment method."}],
-      "right": [{"type": "iconwall", "cols": 3, "items": [
-        {"icon": "tenge", "t": "Cash", "d": "Banknotes and coins issued by the National Bank."},
-        {"icons": ["card", "qr"], "t": "Cards and QR", "d": "Everyday payments in shops and online."},
-        {"icons": ["tenge", "digitalTenge"], "t": "Digital tenge", "d": "A digital form of the national currency, in pilot."},
-        {"icon": "shieldTenge", "t": "Trust", "d": "Rules and oversight make payments safe."},
-        {"icon": "network", "t": "Network", "d": "Banks settle with each other nationwide."},
-        {"icon": "kazakhstan", "t": "Regions", "d": "One system from Atyrau to Oskemen."}]}]
-    },
-    {
-      "layout": "chart", "n": "5", "theme": "nbk", "cols": "1fr 700px", "bg": "waves", "bg_opts": {"y": 0.95, "alpha": 0.7},
-      "tag": "Inflation targeting", "title": "Rate and inflation move together, *with a lag*",
-      "left": [
-        {"type": "text", "t": "When prices rise faster than the target, the rate goes up first. Inflation reacts later, after loans, spending and expectations adjust.", "cls": "lead"},
-        {"type": "bullets", "items": [
-          {"b": "Target.", "t": "Price stability is the main objective."},
-          {"b": "Lag.", "t": "Policy works over months, not days."},
-          {"b": "Communication.", "t": "Clear signals shape expectations."}]}
-      ],
-      "chart": {
-        "series": [
-          {"name": "Inflation", "color": "ink", "width": 2.4, "period": 11, "pts": [[0, 38], [16, 50], [34, 78], [52, 84], [70, 62], [86, 48], [100, 44]]},
-          {"name": "Base rate", "color": "acc", "width": 2.6, "fill": 0.08, "period": 13, "pts": [[0, 34], [16, 38], [30, 58], [46, 80], [64, 82], [82, 66], [100, 52]]}
-        ],
-        "baseline": 46, "baseline_label": "Target (illustrative)", "y_label": "Percent",
-        "phases": [{"from": 14, "to": 50, "label": "Tightening", "color": "acc"}, {"from": 58, "to": 100, "label": "Cooling", "color": "ink"}],
-        "cap": "Illustrative curves, not published data."
-      }
-    },
-    {
-      "layout": "closing", "theme": "nbk-dark", "bg": "aurora", "eyebrow": "In one line",
-      "title": "Stability is *the product.*",
-      "takeaways": [
-        {"icon": "shieldTenge", "acc": true, "title": "Price stability", "t": "The main objective behind every rate decision."},
-        {"icon": "network", "title": "Trusted payments", "t": "One reliable infrastructure for banks and people."},
-        {"icon": "digitalTenge", "title": "Ready for what is next", "t": "Digital tenge and instant payments build on the same foundation."}
-      ],
-      "decor": [{"kind": "ring", "x": 8, "y": 82, "size": 64, "opacity": 0.4, "motion": "float:amp=10,per=9 spin:per=80"}]
+     "t": 14,
+     "s": 1,
+     "x": 0,
+     "y": 0
     }
-  ]
+   ],
+   "layers": [
+    {
+     "type": "text",
+     "t": "PERRICHENO PRESENTATION · MOTION DESIGN",
+     "x": 84,
+     "y": 66,
+     "size": 13,
+     "weight": 500,
+     "spacing": 0.16,
+     "color": "mute",
+     "in": "fade",
+     "at": 0.2
+    },
+    {
+     "type": "text",
+     "t": "National Bank\nof ^^Kazakhstan^^",
+     "x": 80,
+     "y": 150,
+     "size": 92,
+     "spacing": -0.05,
+     "lh": 0.98,
+     "split": "lines",
+     "in": "mask",
+     "at": 0.5,
+     "stagger": 0.2
+    },
+    {
+     "type": "shape",
+     "shape": "rect",
+     "x": 84,
+     "y": 408,
+     "w": 120,
+     "h": 3,
+     "fill": "acc",
+     "in": "wipe",
+     "at": 2.0,
+     "dur": 1.0
+    },
+    {
+     "type": "text",
+     "t": "The institution behind the tenge: price stability, financial stability and the payment system.",
+     "x": 84,
+     "y": 432,
+     "w": 500,
+     "size": 21,
+     "weight": 400,
+     "spacing": 0,
+     "lh": 1.5,
+     "color": "mute",
+     "in": "fade",
+     "at": 2.4
+    },
+    {
+     "type": "counter",
+     "from": 0,
+     "to": 33,
+     "at": 3.6,
+     "cdur": 2.4,
+     "x": 82,
+     "y": 522,
+     "size": 84,
+     "suffix": " years",
+     "color": "acc",
+     "in": "fade"
+    },
+    {
+     "type": "text",
+     "t": "of the tenge, introduced on 15 November 1993",
+     "x": 86,
+     "y": 624,
+     "size": 16,
+     "weight": 400,
+     "spacing": 0,
+     "color": "mute",
+     "in": "fade",
+     "at": 3.6
+    },
+    {
+     "type": "widget",
+     "x": 700,
+     "y": 120,
+     "w": 540,
+     "in": "fade",
+     "at": 0.9,
+     "dur": 2.6,
+     "draw": true,
+     "block": {
+      "type": "map",
+      "points": [
+       "Astana",
+       "Almaty",
+       "Shymkent",
+       "Aktobe",
+       "Atyrau",
+       "Karaganda",
+       "Pavlodar",
+       "Kostanay",
+       "Oskemen",
+       "Aktau"
+      ],
+      "hq": "Astana",
+      "labels": "hq",
+      "signal": true,
+      "graticule": true,
+      "label_size": 26
+     }
+    }
+   ]
+  },
+  {
+   "layout": "spotlight",
+   "n": "1",
+   "theme": "nbk",
+   "bg": "grid",
+   "bg_opts": {
+    "alpha": 0.45
+   },
+   "tag": "Geography",
+   "title": "One country, one currency, *one payment space*",
+   "lead": "From Atyrau to Oskemen, banks and people use the same national currency and the same settlement infrastructure.",
+   "cols": "350px 1fr",
+   "left": [
+    {
+     "type": "bullets",
+     "items": [
+      {
+       "b": "Cash.",
+       "t": "The National Bank issues the tenge and manages banknotes and coins."
+      },
+      {
+       "b": "Payments.",
+       "t": "It oversees payment systems so transfers settle across every region."
+      },
+      {
+       "b": "Stability.",
+       "t": "It works to keep prices and the financial system stable."
+      }
+     ]
+    }
+   ],
+   "right": [
+    {
+     "type": "map",
+     "points": [
+      "Astana",
+      "Almaty",
+      "Shymkent",
+      "Aktobe",
+      "Atyrau",
+      "Aktau",
+      "Karaganda",
+      "Pavlodar",
+      "Kostanay",
+      "Oskemen",
+      "Kyzylorda",
+      "Uralsk"
+     ],
+     "hq": "Astana",
+     "arcs": "hub",
+     "cycle": true,
+     "graticule": true,
+     "labels": {
+      "Astana": "top",
+      "Atyrau": "left",
+      "Aktau": "left",
+      "Uralsk": "left",
+      "Aktobe": "left",
+      "Kyzylorda": "left",
+      "Shymkent": "left",
+      "Almaty": "bottom",
+      "Oskemen": "bottom",
+      "Pavlodar": "top",
+      "Kostanay": "top",
+      "Karaganda": "right"
+     }
+    }
+   ]
+  },
+  {
+   "layout": "history",
+   "n": "2",
+   "theme": "nbk-dark",
+   "bg": "waves",
+   "bg_opts": {
+    "y": 0.93,
+    "alpha": 0.8
+   },
+   "tag": "History",
+   "title": "From a new currency to a *floating tenge*",
+   "lead": "Four moments explain how the National Bank works today.",
+   "loop": 15,
+   "events": [
+    {
+     "year": "1991",
+     "icon": "kazakhstan",
+     "title": "Independence",
+     "t": "Kazakhstan starts building its own financial system."
+    },
+    {
+     "year": "1993",
+     "icon": "tenge",
+     "title": "The tenge",
+     "t": "The national currency is introduced on 15 November, marked every year."
+    },
+    {
+     "year": "2015",
+     "icon": "rate",
+     "title": "Free float",
+     "t": "In August the exchange rate begins to float and inflation targeting becomes the framework."
+    },
+    {
+     "year": "2021",
+     "icon": "digitalTenge",
+     "title": "Digital tenge",
+     "t": "The National Bank starts piloting a digital form of the national currency."
+    }
+   ]
+  },
+  {
+   "layout": "scene",
+   "chrome": false,
+   "theme": "nbk",
+   "bg": "grid",
+   "bg_opts": {
+    "alpha": 0.4
+   },
+   "loop": 18,
+   "poster": 11,
+   "camera": [
+    {
+     "t": 0,
+     "s": 1,
+     "x": 0,
+     "y": 0
+    },
+    {
+     "t": 9,
+     "s": 1.03,
+     "x": -10,
+     "y": -4
+    },
+    {
+     "t": 18,
+     "s": 1,
+     "x": 0,
+     "y": 0
+    }
+   ],
+   "layers": [
+    {
+     "type": "text",
+     "t": "MONETARY POLICY",
+     "x": 84,
+     "y": 66,
+     "size": 13,
+     "weight": 500,
+     "spacing": 0.16,
+     "color": "mute",
+     "in": "fade",
+     "at": 0.2
+    },
+    {
+     "type": "text",
+     "t": "A decision in Astana",
+     "x": 80,
+     "y": 104,
+     "size": 58,
+     "split": "words",
+     "in": "mask",
+     "at": 0.3,
+     "stagger": 0.12
+    },
+    {
+     "type": "text",
+     "t": "becomes ^^a price in the shop.^^",
+     "x": 80,
+     "y": 172,
+     "size": 58,
+     "split": "words",
+     "in": "mask",
+     "at": 1.2,
+     "stagger": 0.12
+    },
+    {
+     "type": "text",
+     "t": "The base rate sets the price of money. Banks pass it on to loans and deposits. Households and firms adjust. Prices follow, with a lag.",
+     "x": 84,
+     "y": 310,
+     "w": 330,
+     "size": 17,
+     "weight": 400,
+     "spacing": 0,
+     "lh": 1.6,
+     "color": "body",
+     "in": "fade",
+     "at": 3.2
+    },
+    {
+     "type": "widget",
+     "x": 470,
+     "y": 268,
+     "w": 720,
+     "in": "fade",
+     "at": 2.4,
+     "dur": 1.2,
+     "block": {
+      "type": "lags",
+      "loop": 13,
+      "shock_label": "Rate decision",
+      "cap": "Illustrative response, not published data.",
+      "rows": [
+       {
+        "t": "Base rate",
+        "d": "set by the National Bank",
+        "kind": "step",
+        "acc": true
+       },
+       {
+        "t": "Money market",
+        "d": "banks lend to each other",
+        "kind": "rise",
+        "delay": 0.0,
+        "tau": 0.035
+       },
+       {
+        "t": "Loan and deposit rates",
+        "d": "what households pay and earn",
+        "kind": "rise",
+        "delay": 0.04,
+        "tau": 0.16
+       },
+       {
+        "t": "Demand",
+        "d": "households and firms spend less",
+        "kind": "fall",
+        "delay": 0.12,
+        "tau": 0.2
+       },
+       {
+        "t": "Inflation",
+        "d": "prices cool, with a lag",
+        "kind": "fall",
+        "delay": 0.3,
+        "tau": 0.3
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "layout": "scene",
+   "chrome": false,
+   "theme": "nbk-dark",
+   "bg": "particles",
+   "bg_opts": {
+    "count": 34
+   },
+   "loop": 18,
+   "poster": 11,
+   "camera": [
+    {
+     "t": 0,
+     "s": 1,
+     "x": 0,
+     "y": 0
+    },
+    {
+     "t": 9,
+     "s": 1.035,
+     "x": 12,
+     "y": -6
+    },
+    {
+     "t": 18,
+     "s": 1,
+     "x": 0,
+     "y": 0
+    }
+   ],
+   "layers": [
+    {
+     "type": "text",
+     "t": "PAYMENTS",
+     "x": 84,
+     "y": 66,
+     "size": 13,
+     "weight": 500,
+     "spacing": 0.16,
+     "color": "mute",
+     "in": "fade",
+     "at": 0.2
+    },
+    {
+     "type": "text",
+     "t": "One tap. *Five steps.*",
+     "x": 80,
+     "y": 96,
+     "size": 84,
+     "spacing": -0.05,
+     "split": "words",
+     "in": "mask",
+     "at": 0.3,
+     "stagger": 0.22
+    },
+    {
+     "type": "widget",
+     "x": 120,
+     "y": 240,
+     "w": 1040,
+     "in": "fade",
+     "at": 1.8,
+     "dur": 1.2,
+     "block": {
+      "type": "journey",
+      "go": "Payment request",
+      "back": "Confirmation",
+      "nodes": [
+       {
+        "kind": "phone",
+        "t": "Customer",
+        "d": "Scans a QR code and confirms"
+       },
+       {
+        "kind": "bank",
+        "t": "Customer's bank",
+        "d": "Checks the balance and sends the order"
+       },
+       {
+        "kind": "nbk",
+        "t": "Settlement",
+        "d": "Banks settle in central bank money"
+       },
+       {
+        "kind": "bank",
+        "t": "Shop's bank",
+        "d": "Credits the merchant's account"
+       },
+       {
+        "kind": "shop",
+        "t": "Shop",
+        "d": "Gets the confirmation, hands over goods"
+       }
+      ]
+     }
+    },
+    {
+     "type": "text",
+     "t": "Illustrative path of a QR payment",
+     "x": 84,
+     "y": 672,
+     "size": 13,
+     "weight": 500,
+     "spacing": 0.02,
+     "color": "faint",
+     "in": "fade",
+     "at": 2.4
+    }
+   ]
+  },
+  {
+   "layout": "scene",
+   "chrome": false,
+   "theme": "nbk",
+   "bg": "waves",
+   "bg_opts": {
+    "y": 0.96,
+    "alpha": 0.7
+   },
+   "loop": 16,
+   "poster": 10,
+   "layers": [
+    {
+     "type": "text",
+     "t": "WHY PRICE STABILITY MATTERS",
+     "x": 84,
+     "y": 66,
+     "size": 13,
+     "weight": 500,
+     "spacing": 0.16,
+     "color": "mute",
+     "in": "fade",
+     "at": 0.2
+    },
+    {
+     "type": "text",
+     "t": "What is 100 tenge worth\nin ten years?",
+     "x": 80,
+     "y": 96,
+     "size": 60,
+     "lh": 1.02,
+     "split": "lines",
+     "in": "mask",
+     "at": 0.3,
+     "stagger": 0.22
+    },
+    {
+     "type": "widget",
+     "x": 270,
+     "y": 250,
+     "w": 740,
+     "in": "fade",
+     "at": 2.0,
+     "dur": 1.2,
+     "block": {
+      "type": "erosion",
+      "rates": [
+       5,
+       10
+      ],
+      "years": 10,
+      "loop": 12,
+      "cap": "Illustrative arithmetic: 100 / (1 + rate) ^ years. Not a forecast."
+     }
+    }
+   ]
+  },
+  {
+   "layout": "scene",
+   "chrome": false,
+   "theme": "nbk-dark",
+   "bg": "aurora",
+   "loop": 14,
+   "poster": 8,
+   "camera": [
+    {
+     "t": 0,
+     "s": 1,
+     "x": 0,
+     "y": 0
+    },
+    {
+     "t": 7,
+     "s": 1.03,
+     "x": 10,
+     "y": -4
+    },
+    {
+     "t": 14,
+     "s": 1,
+     "x": 0,
+     "y": 0
+    }
+   ],
+   "layers": [
+    {
+     "type": "text",
+     "t": "Stability\nis the\n^^product.^^",
+     "x": 80,
+     "y": 120,
+     "size": 132,
+     "spacing": -0.055,
+     "lh": 0.95,
+     "split": "lines",
+     "in": "mask",
+     "at": 0.4,
+     "stagger": 0.24
+    },
+    {
+     "type": "shape",
+     "shape": "rect",
+     "x": 84,
+     "y": 588,
+     "w": 120,
+     "h": 3,
+     "fill": "acc",
+     "in": "wipe",
+     "at": 2.4
+    },
+    {
+     "type": "text",
+     "t": "Price stability  ·  Trusted payments  ·  Digital tenge",
+     "x": 84,
+     "y": 612,
+     "size": 18,
+     "weight": 400,
+     "spacing": 0,
+     "color": "mute",
+     "in": "fade",
+     "at": 2.8
+    },
+    {
+     "type": "widget",
+     "x": 700,
+     "y": 96,
+     "w": 500,
+     "in": "zoom",
+     "at": 0.7,
+     "block": {
+      "type": "baiterek"
+     }
+    }
+   ]
+  }
+ ]
 }

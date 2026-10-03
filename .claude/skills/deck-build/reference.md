@@ -22,6 +22,24 @@ Text fields accept inline markup: `**bold**`, `*dim grey*`, `^^accent shine^^`, 
 Set `"theme"` on the deck and/or on any slide (the page chrome follows the slide): `paper` (default light), `sand`, `sky`, `mono`, `ink` (dark navy + gold), `night` (dark + cyan), `nbk` and `nbk-dark` (National Bank of Kazakhstan: logo green #00471C, gold #9A7500, slate #2f3c49). Mix themes between slides, and mix layouts and `bg` scenes, so decks do not look alike. New palette = add a `[data-theme=name]{...}` block of CSS variables in `engine/theme.add.css`.
 Scenes: `aurora grid waves orbits particles steppe`.
 
+## Scene layout: real motion design (preferred for anything that must not look like a template)
+`layout:"scene"` is an After Effects style composition: free layers on a 1280x720 canvas, each with an in point (`at`) and out point (`out`) on a **looping timeline** (`loop` seconds). Everything repeats seamlessly forever. Use `"chrome":false` for full-bleed (no header/footer).
+```jsonc
+{"layout":"scene","chrome":false,"theme":"nbk-dark","bg":"steppe","loop":14,"poster":8,   // poster = still frame used for PDF/thumbnails (all layers visible)
+ "camera":[{"t":0,"s":1,"x":0,"y":0},{"t":7,"s":1.04,"x":-16,"y":-6},{"t":14,"s":1,"x":0,"y":0}],   // slow push, returns to start for a seamless loop
+ "layers":[ …layers… ]}
+```
+Common layer fields: `type`, `x`,`y` (px, top-left; `anchor`: tl tc tr cl c cr bl bc br), `at`, `out`, `in`, `outAnim`, `dur`, `stagger`, `z`, `loop` (ambient `data-motion` string, e.g. `"float:amp=6,per=8"`), `anim` (keyframes `[{t,x,y,s,r,o,b,ease}]` in composition time).
+- `in` presets: `rise mask fade pop blur slide slider drop zoom wipe draw none`. `outAnim`: `fade rise mask shrink cut blur wipe zoom` (default: fade just before the loop ends). `mask` = text slides up from behind a clip.
+- `text`: `t` (markup `*dim*`, `^^accent^^`, `\n` line breaks), `size`, `weight`, `spacing` (em), `lh`, `color` (ink mute faint acc body on or any CSS colour), `align`, `w` (wrap width), `upper`, `split`: `chars|words|lines` (each piece animates in turn, `stagger` seconds).
+- `shape`: `shape` rect|circle|ring|line|plus|path (`d`,`vb`), `w`,`h`,`fill`,`stroke`,`sw`,`r`,`opacity`; `in:"draw"` draws the stroke on (trim path), `in:"wipe"` reveals it.
+- `widget`: `block` = any block (map, lags, journey, erosion, baiterek, curve, whisker…), `w`; add `draw:true` to draw a map outline on. Widgets keep their own looping behaviours.
+- `icon`: `name`, `size`, `sw`, `color`, `seq:[{at,to}]` morphs through icons on the timeline. `counter`: `from`,`to`,`at`,`cdur`,`dec`,`prefix`,`suffix`,`size`,`color`.
+**Storyboard recipe** (what a good scene does): 0-1 s eyebrow fades in; 0.3-2 s headline rises word by word (`mask`); 2-3 s a rule wipes in and the sub-line fades; 3-6 s the visual (map/chart/diagram) draws on and starts its own loop; last 0.6 s everything fades so the loop restarts cleanly. Tell one idea per scene with a visual that *explains* it (a signal crossing a country, a lag between a decision and prices, a payment travelling through banks, coins losing value year by year), not a grid of icons.
+
+## Storytelling widgets
+- `map {…, signal:true, label_size}`: waves leave the HQ and light each city on arrival. · `lags {rows:[{t,d,kind:"step"|"rise"|"fall",delay,tau,acc?}], shock?, shock_label, ticks?, loop, cap}`: impulse response; a cursor sweeps time and each row lights up when it reacts. · `journey {nodes:[{kind:"phone"|"bank"|"nbk"|"shop",t,d}], go, back}`: a request travels out and the confirmation returns. · `erosion {rates:[5,10], years, loop, cap}`: coins shrink year by year (exact arithmetic 100/(1+r)^y). · `baiterek {}`: line illustration with a slow sun.
+
 ## Layouts
 | layout | fields |
 |---|---|
@@ -37,6 +55,7 @@ Scenes: `aurora grid waves orbits particles steppe`.
 | `poster` | editorial cover: `eyebrow`, `title` (very large), `sub`, `left:[blocks]`, `art:[blocks]` (right, e.g. a `map`), `ticker:[…]`, `cols` |
 | `spotlight` | text left, one big visual right: `title`, `n`, `lead`, `left:[blocks]`, `right:[blocks]` (`map`, `dial`, `iconwall`, `curve`…), `cols:"350px 1fr"` |
 | `history` | timeline with a travelling pulse that lights each event: `title`, `n`, `lead`, `events:[{year,icon?,title,t}]`, `loop` seconds |
+| `scene` | see the section above (layers, loop, poster, camera, chrome:false) |
 | `html` | `html` (escape hatch; avoid) |
 
 ## Blocks (`{"type": …}`; a plain string is a text block)
