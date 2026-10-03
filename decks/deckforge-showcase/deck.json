@@ -1,0 +1,99 @@
+{
+  "title": "Deckforge: presentations as data",
+  "subtitle": "Write a short JSON file. Get layouts, looping motion graphics, a PDF and a phone remote.",
+  "authors": [],
+  "date": "2026-10",
+  "tags": ["Tools", "Motion"],
+  "minutes": 3,
+  "tag": "Deckforge",
+  "footer": "Showcase deck",
+  "footer_right": "deckforge",
+  "motion": {"intensity": 1, "speed": 1},
+  "slides": [
+    {
+      "layout": "cover", "bg": "aurora", "eyebrow": "Presentations as data",
+      "title": "Describe the deck. *Get the motion for free.*",
+      "meta": [["Input", "One deck.json"], ["Output", "Web, PDF, phone remote"], ["Motion", "Looped, never identical"]],
+      "decor": [
+        {"kind": "ring", "x": 62, "y": 8, "size": 70, "opacity": 0.5, "motion": "float:amp=10,per=7 spin:per=60"},
+        {"kind": "plus", "x": 48, "y": 88, "size": 22, "motion": "spin:per=24"},
+        {"kind": "dot", "x": 93, "y": 70, "size": 12, "motion": "float:amp=14,per=5 pulse:scale=1.4,per=3"}
+      ],
+      "left": [
+        {"type": "steps", "label": "From idea to stage", "items": [
+          {"icon": "fileText", "t": "1 Describe", "d": "A single JSON file"},
+          {"icon": "layers", "t": "2 Build", "d": "Layouts and blocks"},
+          {"icon": "sparkles", "t": "3 Animate", "d": "Every visual loops"},
+          {"icon": "send", "t": "4 Present", "d": "Phone remote over SSE"}
+        ]},
+        {"type": "ticker", "items": ["Looped motion", "Seeded randomness", "Keyframes", "Morphing icons", "Ambient scenes", "PDF export", "Live remote"]}
+      ],
+      "right": [
+        {"type": "hero", "icons": ["fileText", "layers", "sparkles", "send", "bot"], "captions": ["Describe", "Build", "Animate", "Present", "Automate"]},
+        {"type": "toc", "items": [
+          {"icon": "chartLine", "t": "Motion", "pg": "Slide 2"}, {"icon": "workflow", "t": "Pipeline", "pg": "Slide 3"},
+          {"icon": "gauge", "t": "Charts", "pg": "Slide 4"}, {"icon": "timer", "t": "Numbers", "pg": "Slide 5"}]}
+      ]
+    },
+    {
+      "layout": "cards", "n": 1, "bg": "grid", "bg_opts": {"alpha": 0.7},
+      "tag": "Motion graphics", "title": "Every visual moves, and *never repeats* exactly",
+      "lead": "Markers, packets and highlights run on their own rhythms, so the picture never lines up twice.",
+      "cards": [
+        {"icon": "equal", "title": "Converging lines", "t": "A marker rides each curve with a pulsing halo.", "viz": {"kind": "converge"}, "cap": "Lines drawn on entry, then looped."},
+        {"icon": "trendingDown", "title": "Decay curves", "t": "Fills and markers move on different periods.", "viz": {"kind": "decay"}, "cap": "Period 6.3 s, drifting phase."},
+        {"icon": "copy", "title": "Packets", "t": "Requests flow into one box at random moments.", "viz": {"kind": "packets"}, "cap": "Random spawn, eased paths."}
+      ]
+    },
+    {
+      "layout": "flow", "n": 2, "bg": "waves", "bg_opts": {"y": 0.93}, "tag": "Pipeline", "title": "One file in, a *live site and a PDF* out",
+      "blocks": [
+        {"type": "flowcards", "nodes": [
+          {"icon": "fileText", "title": "deck.json", "label": "You write", "items": ["Slides as data", "No HTML or CSS", "Icons by name"]},
+          {"icon": "layers", "title": "Build", "label": "Automatic", "items": ["Layouts and blocks", "Icon check", "Rebuild on save"]},
+          {"icon": "sparkles", "title": "Motion engine", "label": "Runtime", "out": true, "subs": [["Scenes", "aurora, grid"], ["Behaviors", "flow, morph"], ["Keyframes", "x y s r o"]], "items": ["Plugins per deck"]},
+          {"icon": "send", "title": "Present", "label": "On stage", "items": ["Phone remote", "Speaker notes", "PDF download"]}
+        ]},
+        {"type": "mod", "icon": "lightbulb", "t": "**Tip:** the whole engine is a registry. Add a behavior in `plugin.js` and any element can use it with a data attribute."},
+        {"type": "html", "html": "<div data-heartbeat class=\"note\" style=\"margin-top:10px\"><span>Custom plugin running: this note pulses from decks/deckforge-showcase/plugin.js</span></div>"}
+      ],
+      "columns": [
+        [{"type": "minis", "eyebrow": "Cheap for the author", "items": [{"icon": "fileText", "b": "Content only.", "t": "The model writes JSON, never markup."}, {"icon": "timer", "b": "Instant.", "t": "Saved files are live in about a second."}]}],
+        [{"type": "minis", "eyebrow": "Flexible for the designer", "items": [{"icon": "sparkles", "b": "data-motion.", "t": "float, pulse, spin, sway, breathe, wobble."}, {"icon": "workflow", "b": "Keyframes.", "t": "Timelines with easing, ping-pong and jitter."}]}],
+        [{"type": "notes", "eyebrow": "Safe by default", "items": [{"b": "Reduced motion:", "t": "respected unless the deck opts out."}, {"b": "PDF:", "t": "static frame, no loops."}, {"b": "Thumbnails:", "t": "driven by the gallery.", "solid": true}]}]
+      ]
+    },
+    {
+      "layout": "chart", "n": 3, "bg": "orbits", "tag": "Charts",
+      "title": "Curves with *moving markers*",
+      "left": [
+        {"type": "text", "t": "Give a handful of points per series. The engine draws a smooth line, fills the area to a baseline and walks a marker along it.", "cls": "lead"},
+        {"type": "bullets", "items": [
+          {"b": "Series.", "t": "Any number of lines, each with its own colour and period."},
+          {"b": "Phases.", "t": "Brackets under the axis label stages of the story."},
+          {"b": "Baseline.", "t": "A dashed reference that shades gains and dips."}]}
+      ],
+      "chart": {
+        "series": [
+          {"name": "With the engine", "color": "acc", "width": 2.6, "fill": 0.08, "period": 10.5, "pts": [[0, 50], [14, 44], [30, 28], [48, 30], [66, 62], [82, 84], [100, 92]]},
+          {"name": "Static slides", "color": "faint", "width": 2, "period": 15, "pts": [[0, 50], [40, 48], [70, 52], [100, 53]]}
+        ],
+        "baseline": 50, "y_label": "Audience attention", "baseline_label": "Baseline",
+        "phases": [{"from": 12, "to": 48, "label": "Setup", "color": "acc"}, {"from": 58, "to": 100, "label": "Payoff", "color": "ink"}],
+        "cap": "Illustrative curve, not measured data."
+      }
+    },
+    {
+      "layout": "stats", "n": 4, "bg": "particles", "tag": "Numbers", "title": "Big numbers *count up* and keep breathing",
+      "lead": "Counters animate when the slide opens, then drift slightly so a live number never looks frozen.",
+      "items": [
+        {"icon": "timer", "acc": true, "to": 1, "dec": 0, "amp": 0.0, "suffix": "s", "label": "From saving the file to seeing it live", "bar": 0.2},
+        {"icon": "layers", "to": 12, "amp": 0, "label": "Layouts and blocks ready to combine", "bar": 0.6},
+        {"icon": "sparkles", "to": 98, "dec": 0, "amp": 1, "suffix": "%", "label": "Of the markup you never write", "bar": 0.98}
+      ],
+      "blocks": [
+        {"type": "note", "icon": "lightbulb", "t": "Replace these numbers with real ones before you present. Counters take `to`, `dec`, `amp` and `suffix`."}
+      ]
+    }
+  ]
+}
