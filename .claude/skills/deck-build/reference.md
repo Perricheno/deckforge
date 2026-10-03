@@ -18,6 +18,10 @@ Text fields accept inline markup: `**bold**`, `*dim grey*`, `^^accent shine^^`, 
 - `bg`: `aurora` | `grid` | `waves` | `orbits` | `particles`. `bg_opts` e.g. `{"alpha":0.7,"color":"#3366ff"}`; waves `{"y":0.9}`; grid `{"cols":40,"rows":22}`; orbits `{"x":0.8,"y":0.5,"speed":1}`; particles `{"count":46}`.
 - `decor`: free-floating shapes `{"kind":"ring|dot|square|plus|line","x":62,"y":8,"size":70,"color":"#ff4b1f","opacity":0.5,"motion":"float:amp=10,per=7 spin:per=60"}` (x,y in % of the slide).
 
+## Themes and design variety
+Set `"theme"` on the deck and/or on any slide (the page chrome follows the slide): `paper` (default light), `sand`, `sky`, `mono`, `ink` (dark navy + gold), `night` (dark + cyan), `nbk` and `nbk-dark` (National Bank of Kazakhstan: logo green #00471C, gold #9A7500, slate #2f3c49). Mix themes between slides, and mix layouts and `bg` scenes, so decks do not look alike. New palette = add a `[data-theme=name]{...}` block of CSS variables in `engine/theme.add.css`.
+Scenes: `aurora grid waves orbits particles steppe`.
+
 ## Layouts
 | layout | fields |
 |---|---|
@@ -30,6 +34,9 @@ Text fields accept inline markup: `**bold**`, `*dim grey*`, `^^accent shine^^`, 
 | `compare` | `title`, `n`, `formula:[{icon,t,op?:"x"\|"=",out?}]`, `items:[{name,sub,rows:[{icon,label,v 0..1}]}]` (two firms/options; meters breathe, % follows), `out_label`, `cap` |
 | `stats` | `title`, `n`, `lead`, `items:[{icon?,acc?,to,dec?,amp?,suffix?,label,bar? 0..1}]` (count up, then drift), `blocks:[…]` |
 | `closing` | `eyebrow`, `title`, `takeaways:[{icon,acc?,title,t}]` (authors added) |
+| `poster` | editorial cover: `eyebrow`, `title` (very large), `sub`, `left:[blocks]`, `art:[blocks]` (right, e.g. a `map`), `ticker:[…]`, `cols` |
+| `spotlight` | text left, one big visual right: `title`, `n`, `lead`, `left:[blocks]`, `right:[blocks]` (`map`, `dial`, `iconwall`, `curve`…), `cols:"350px 1fr"` |
+| `history` | timeline with a travelling pulse that lights each event: `title`, `n`, `lead`, `events:[{year,icon?,title,t}]`, `loop` seconds |
 | `html` | `html` (escape hatch; avoid) |
 
 ## Blocks (`{"type": …}`; a plain string is a text block)
@@ -42,6 +49,8 @@ Any block may add `motion`, `kf`, `dur`, `pingpong` (see Motion).
 - `steps {items:[{icon,t,d}], label?, style?:"pipe"|"apipe"}` · `flowcards {nodes:[{icon,title,label,items:[],out?,subs?:[[b,t]]}]}` (boxes joined by flowing dots)
 - `whisker {title, rows:[[label,mean,lo,hi]], min,max, axis, chips?:{title,items}, cap}` (confidence intervals that drift) · `guard {title, items:[{icon,b,t}], gauge?:{title,bands:[…],marker %,t}}` · `thr {title, rows:[[k,v]], joint?:["a","b","!result"]}`
 - `curve` (use as `chart`): `{series:[{name,color:"acc"|"ink"|"faint"|"#hex",width?,fill?,period?,pts:[[x,y]…]}], baseline?, baseline_label?, y_label?, phases?:[{from,to,label,color}], cap?}` x,y in 0..100, y up. Smooth line + walking marker.
+- `map {points:["Astana","Almaty",…] or [{name,lat,lon}], hq:"Astana", arcs:"hub"|[[a,b]], labels:true|false|"hq"|{name:"left|right|top|bottom"}, cycle:true, graticule:true}` Kazakhstan outline (Natural Earth, public domain) with pulsing HQ, flowing arcs, cities highlighted in turn. Built-in cities: Astana Almaty Shymkent Aktobe Atyrau Aktau Karaganda Pavlodar Kostanay Oskemen Kyzylorda Uralsk Taraz Turkistan Semey Petropavl Kokshetau Taldykorgan Zhezkazgan Baikonur.
+- `dial {value 0..1, amp?, title, cap}` gauge whose needle breathes (label illustrative values) · `iconwall {cols, items:[{icon|icons:[a,b], t, d}]}` (several icons = they morph) · `morphline {icons:[…], size?}` row of morphing icons · `bigtype {t}`
 - `question {label,t,icons:[…]}` (dark card with morphing icon) · `subq {items:[[k,v]]}` · `glance {items:[[k,v]]}` · `toc {items:[{icon,t,pg}]}` · `hero {icons:[…],captions:[…]}` (orbiting, morphing) · `outline {items:[{icon,t,pg}]}` · `ticker {items:[…]}` (infinite marquee) · `firms` · `stats` · `cards` · `viz {kind}` · `html {html}`
 
 ## Motion (declarative, no code)
@@ -62,7 +71,8 @@ DM.scene('stripes', (ctx, t, w, h, opts) => { /* draw on a 1280x720 canvas */ })
 
 ## Icons available (camelCase)
 activity arrowLeft arrowRight bot building2 chartBarBig chartColumn chartLine chartNoAxesColumnIncreasing check circleHelp clipboardList clock compass copy cpu database download equal eye factory fileDown fileText filter flaskConical gauge gitBranch gitMerge graduationCap layers lightbulb listChecks lockOpen lock messageCircle monitor repeat rocket route scale scanSearch search send shieldCheck sparkles sprout star tags target thumbsUp timer trendingDown userCheck users workflow x zap
-More: `python tools/addicons.py chart-pie map-pin` (kebab-case Lucide ids), then use `chartPie`, `mapPin`.
+Custom drawn set (24x24, made for this project, `assets/vendor/icons.custom.js`): tenge nbk baiterek shanyrak yurt rate inflation digitalTenge card qr shieldTenge network kazakhstan sun. Add your own by writing an IconNode there (same format as Lucide); morphicons morphs between any two.
+More Lucide: `python tools/addicons.py chart-pie map-pin` (kebab-case Lucide ids), then use `chartPie`, `mapPin`.
 
 ## Remote, speech and URLs
 - Deck: `/<slug>/`  ·  gallery: `/`  ·  presenter remote: `/admin/` (6-digit PIN) · PDF: `/<slug>/<pdf>`.

@@ -26,7 +26,6 @@ svg{display:block}
 .head,.foot{display:flex;justify-content:space-between;align-items:center;height:16px;font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
 .head{padding-bottom:0}
 .head .tag{display:flex;align-items:center;gap:8px;color:var(--mute)}
-.head .tag::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--acc)}
 .foot{border-top:1px solid var(--line);height:32px;padding-top:12px;align-items:flex-start}
 .body{flex:1;min-height:0;display:flex;flex-direction:column;padding:24px 0 20px}
 
@@ -47,7 +46,7 @@ p,li{font-size:14px;line-height:1.6;color:var(--body);font-weight:400}
 .rule{height:1px;background:var(--line);margin:16px 0}
 ul.b{list-style:none;display:flex;flex-direction:column;gap:8px}
 ul.b li{position:relative;padding-left:16px}
-ul.b li::before{content:"";position:absolute;left:0;top:.62em;width:6px;height:2px;background:var(--acc)}
+ul.b li::before{content:"";position:absolute;left:0;top:.62em;width:6px;height:1px;background:var(--faint)}
 ul.b li b{font-weight:600;color:var(--ink)}
 
 /* ---------- parts ---------- */
@@ -243,7 +242,7 @@ td .k .ico{width:28px;height:28px;border-radius:8px}
 .fb h3 .ico{width:28px;height:28px;border-radius:8px}
 .fb ul{list-style:none;display:flex;flex-direction:column;gap:6px}
 .fb li{font-size:12px;line-height:1.4;color:var(--body);padding-left:12px;position:relative}
-.fb li::before{content:"";position:absolute;left:0;top:.6em;width:5px;height:2px;background:var(--acc)}
+.fb li::before{content:"";position:absolute;left:0;top:.6em;width:5px;height:1px;background:var(--faint)}
 .fb .lab{font-size:10.5px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
 .fb.out{border-color:var(--ink)}
 .sub3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
@@ -290,7 +289,7 @@ td .k .ico{width:28px;height:28px;border-radius:8px}
 .dc .hd small{display:block;font-size:11px;font-weight:400;color:var(--faint);margin-top:1px}
 .dc ul{list-style:none;display:flex;flex-direction:column;gap:6px}
 .dc li{font-size:12px;line-height:1.45;color:var(--body);padding-left:12px;position:relative}
-.dc li::before{content:"";position:absolute;left:0;top:.62em;width:5px;height:2px;background:var(--acc)}
+.dc li::before{content:"";position:absolute;left:0;top:.62em;width:5px;height:1px;background:var(--faint)}
 .dc li code{font:500 11px var(--sans);background:var(--tint);padding:1px 6px;border-radius:5px;color:var(--ink)}
 .dcw{position:relative;height:40px}
 .dcw svg{position:absolute;inset:0;width:100%;height:100%}
@@ -490,7 +489,7 @@ td .k .ico{width:28px;height:28px;border-radius:8px}
 .guard li svg,.mini svg{flex:none}
 .guard li svg{width:15px;height:15px;margin-top:1px}
 .hmap .eyebrow{margin-top:10px!important}
-</style>
+.flow.dashed{stroke-dasharray:3 5;animation:dash 1.5s linear infinite}@keyframes dash{to{stroke-dashoffset:-16}}@media print{.flow.dashed{animation:none}}</style>
 </head>
 <body>
 
@@ -557,13 +556,13 @@ td .k .ico{width:28px;height:28px;border-radius:8px}
     <h2 class="rise" style="--d:0"><span class="n">1</span>Framework: from user context to outcomes and continued use</h2>
     <div class="fw rise" style="--d:1">
       <div class="card fb"><h3><span class="ico"><morph-icon data-i="graduationCap" size="14" stroke-width="2"></morph-icon></span>User and context</h3><span class="lab">Inputs</span><ul><li>Study level and field</li><li>Prior LaTeX experience</li><li>Plan tier</li><li>Document type</li></ul></div>
-      <div class="conn"><svg viewBox="0 0 28 12"><path class="flow" d="M0 6H26" stroke="#a9a9a2" fill="none" stroke-width="1.5"/><path d="M21 1l5 5-5 5" stroke="#a9a9a2" fill="none" stroke-width="1.5"/></svg></div>
+      <div class="conn"><svg viewBox="0 0 28 12"><path class="flow dashed" d="M0 6H26" stroke="#a9a9a2" fill="none" stroke-width="1.5"/><path d="M21 1l5 5-5 5" stroke="#a9a9a2" fill="none" stroke-width="1.5"/></svg></div>
       <div class="card fb"><h3><span class="ico"><morph-icon data-i="activity" size="14" stroke-width="2"></morph-icon></span>Service use</h3><span class="lab">Behavior</span><ul><li>Sessions per user</li><li>Stages done, errors</li><li>Revisions, repair cycles</li><li>Tokens spent</li></ul></div>
-      <div class="conn"><svg viewBox="0 0 28 12"><path class="flow" d="M0 6H26" stroke="#a9a9a2" fill="none" stroke-width="1.5"/><path d="M21 1l5 5-5 5" stroke="#a9a9a2" fill="none" stroke-width="1.5"/></svg></div>
+      <div class="conn"><svg viewBox="0 0 28 12"><path class="flow dashed" d="M0 6H26" stroke="#a9a9a2" fill="none" stroke-width="1.5"/><path d="M21 1l5 5-5 5" stroke="#a9a9a2" fill="none" stroke-width="1.5"/></svg></div>
       <div class="card fb out"><h3><span class="ico acc"><morph-icon data-i="gauge" size="14" stroke-width="2"></morph-icon></span>Outcomes</h3><span class="lab">Dependent variables</span>
         <div class="sub3"><div><b>Efficiency</b>Time to document</div><div><b>Quality</b>Compile success</div><div><b>Perception</b>Usefulness, ease</div></div>
         <ul><li>Satisfaction after each document</li></ul></div>
-      <div class="conn"><svg viewBox="0 0 28 12"><path class="flow" d="M0 6H26" stroke="#a9a9a2" fill="none" stroke-width="1.5"/><path d="M21 1l5 5-5 5" stroke="#a9a9a2" fill="none" stroke-width="1.5"/></svg></div>
+      <div class="conn"><svg viewBox="0 0 28 12"><path class="flow dashed" d="M0 6H26" stroke="#a9a9a2" fill="none" stroke-width="1.5"/><path d="M21 1l5 5-5 5" stroke="#a9a9a2" fill="none" stroke-width="1.5"/></svg></div>
       <div class="card fb"><h3><span class="ico"><morph-icon data-i="repeat" size="14" stroke-width="2"></morph-icon></span>Continued use</h3><span class="lab">Result</span><ul><li>Repeat sessions (2+)</li><li>Intention to continue</li><li>Willingness to pay</li></ul></div>
     </div>
     <div class="mod rise" style="--d:2"><morph-icon data-i="scale" size="16" stroke-width="2"></morph-icon><span><b>Moderators:</b> experience, plan tier and document type may change how strongly use leads to outcomes. <b>Feedback loop:</b> outcomes decide whether the user returns. Anchored in technology-acceptance ideas (usefulness, ease of use) and usability (SUS).</span></div>
@@ -626,7 +625,7 @@ td .k .ico{width:28px;height:28px;border-radius:8px}
           <ul><li>Pre-survey: background, baseline time</li><li>Micro-survey after each document; final survey</li></ul></div>
         <div class="card dc"><div class="hd"><div class="ico"><morph-icon data-i="timer" size="16" stroke-width="2"></morph-icon></div><div><h3>Response-quality data</h3><small>For cleaning and validity</small></div></div>
           <ul><li>Completion time and rate; drop-off per question</li><li>Attention check, duplicate and speeder flags</li></ul></div>
-        <div class="dcw"><svg viewBox="0 0 400 28" preserveAspectRatio="none"><path class="flow" d="M200 0V28" fill="none" stroke="#a9a9a2" stroke-width="1.5"/></svg></div>
+        <div class="dcw"><svg viewBox="0 0 400 28" preserveAspectRatio="none"><path class="flow dashed" d="M200 0V28" fill="none" stroke="#a9a9a2" stroke-width="1.5"/></svg></div>
         <div class="card merge"><div class="ico"><morph-icon data-i="database" size="16" stroke-width="2"></morph-icon></div><div><h3>Participant-level dataset</h3><p>Joined by a hashed ID; names and Telegram IDs removed.</p></div></div>
       </div>
     </div>
@@ -778,7 +777,7 @@ function go(n){
 function fit(){
   const w=innerWidth,h=innerHeight,portrait=h>w*1.15;
   const ui=h<500?34:56;
-  const s=portrait?Math.min(w/720,(h-112)/1280):Math.min(w/1280,(h-ui)/720);
+  const s=portrait?Math.min(w/720,(h-112)/1280):Math.min(w/1280,(h-(matchMedia('(hover:hover)').matches?0:ui))/720);
   deck.style.transform='translate(-50%,-50%) scale('+s+')'+(portrait?' rotate(90deg)':'');
 }
 addEventListener('resize',fit);fit();
@@ -803,7 +802,7 @@ if(!PDF&&!REDUCE){
   // data flows along every connector line, each on its own rhythm
   slides.forEach((sl,i)=>{
     $('svg',sl).forEach(svg=>{
-      $('path.flow',svg).forEach(p=>{
+      $('path.flow',svg).forEach(p=>{if(p.classList.contains('dashed'))return;
         const len=p.getTotalLength(),per=2.4+Math.random()*2.2,ph=Math.random(),c=mk(svg,3,'#ff4b1f');
         on(i,t=>{const q=((t/per)+ph)%1,pt=p.getPointAtLength(len*ease(q));c.setAttribute('cx',pt.x);c.setAttribute('cy',pt.y);c.setAttribute('opacity',Math.sin(Math.PI*q))});
       });

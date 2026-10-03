@@ -119,7 +119,7 @@ def b_datacards(b):
         out.append(f'<div class="card dc"><div class="hd">{ico(c.get("icon","database"), c.get("acc"))}<div><h3>{rich(c["title"])}</h3><small>{rich(c.get("sub",""))}</small></div></div><ul>{li}</ul></div>')
     if b.get("merge"):
         m = b["merge"]
-        out.append(f'<div class="dcw"><svg viewBox="0 0 400 28" preserveAspectRatio="none"><path class="flow" d="M200 0V28" fill="none" stroke="#a9a9a2" stroke-width="1.5"/></svg></div>')
+        out.append(f'<div class="dcw"><svg viewBox="0 0 400 28" preserveAspectRatio="none"><path class="flow dashed" d="M200 0V28" fill="none" stroke="var(--faint)" stroke-width="1.5"/></svg></div>')
         out.append(f'<div class="card merge">{ico(m.get("icon","database"))}<div><h3>{rich(m["title"])}</h3><p>{rich(m["t"])}</p></div></div>')
     return f'<div style="display:flex;flex-direction:column;gap:8px">{"".join(out)}</div>'
 
@@ -184,7 +184,7 @@ def b_guard(b):
     if b.get("gauge"):
         gg = b["gauge"]
         labels = gg["bands"]
-        bands = "".join('<i style="width:%.1f%%;background:%s"></i>' % (100 / len(labels), c) for c, _ in zip(["#e5e5df", "#cfcfc8", "#a9a9a2", "#6f6f69", "#141412", "#141412"][:len(labels)], labels))
+        bands = "".join('<i style="width:%.1f%%;background:%s"></i>' % (100 / len(labels), c) for c, _ in zip(["var(--k1)", "var(--k2)", "var(--k3)", "var(--k4)", "var(--k5)", "var(--k5)"][:len(labels)], labels))
         g = (f'<div class="kap"><div class="eyebrow" style="margin-bottom:8px">{rich(gg["title"])}</div><div class="ks">{bands}<b data-base="{gg.get("marker",50)}" style="left:{gg.get("marker",50)}%"></b></div>'
              f'<div class="kl">{"".join(f"<span style=&quot;width:{100/len(labels):.1f}%&quot;>{rich(l)}</span>" for l in labels)}</div><p class="cap" style="margin-top:6px">{rich(gg.get("t",""))}</p></div>').replace("&quot;", '"')
     return f'<div class="card guard"><h3>{rich(b["title"])}</h3><ul>{li}</ul>{g}</div>'
@@ -216,10 +216,10 @@ def b_curve(b):
             c2 = (p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6)
             d += f"C{c1[0]:.1f} {c1[1]:.1f} {c2[0]:.1f} {c2[1]:.1f} {p2[0]:.1f} {p2[1]:.1f}"
         return d, P
-    col = {"acc": "#ff4b1f", "ink": "#141412", "faint": "#a9a9a2"}
+    col = {"acc": "var(--acc)", "ink": "var(--ink)", "faint": "var(--faint)"}
     svg = [f'<path class="gr" d="M{X0} 24H{X1}M{X0} 72H{X1}M{X0} 128H{X1}"/><path class="ax" d="M{X0} 8V{Y0}H{X1}"/>']
     if b.get("baseline") is not None:
-        svg.append(f'<path d="M{X0} {Y(b["baseline"]):.1f}H{X1}" stroke="#a9a9a2" stroke-dasharray="4 5"/>')
+        svg.append(f'<path d="M{X0} {Y(b["baseline"]):.1f}H{X1}" stroke="var(--faint)" stroke-dasharray="4 5"/>')
     legend = []
     for k, s in enumerate(b["series"]):
         c = col.get(s.get("color", "ink"), s.get("color"))
@@ -249,16 +249,16 @@ def b_viz(b):
              '<path class="ln draw mk" data-p="8.3" data-r="3.5" pathLength="1" d="M0 44C70 42 150 20 236 14"/>')
         return f'<div class="viz"><svg viewBox="0 0 240 76">{s}</svg></div>'
     if k == "decay":
-        s = ('<path class="gr" d="M0 20H240M0 40H240M0 60H240"/><path class="ax" d="M0 74H240"/><path d="M0 8C56 48 120 66 236 70V74H0Z" fill="#ff4b1f" fill-opacity=".09"/>'
-             '<path class="ln draw mk" data-p="6.3" data-c="#ff4b1f" data-r="4" pathLength="1" stroke="#ff4b1f" d="M0 8C56 48 120 66 236 70"/>')
+        s = ('<path class="gr" d="M0 20H240M0 40H240M0 60H240"/><path class="ax" d="M0 74H240"/><path d="M0 8C56 48 120 66 236 70V74H0Z" fill="var(--acc)" fill-opacity=".09"/>'
+             '<path class="ln draw mk" data-p="6.3" data-c="var(--acc)" data-r="4" pathLength="1" stroke="var(--acc)" d="M0 8C56 48 120 66 236 70"/>')
         return f'<div class="viz"><svg viewBox="0 0 240 76">{s}</svg></div>'
     if k == "packets":
         pk = json.dumps({"from": [[34, 16], [34, 38], [34, 60]], "mid": [90, 38], "out": [200, 38]})
-        s = ('<g stroke="#a9a9a2" stroke-width="1.2" fill="none"><path d="M34 16L90 38M34 38H90M34 60L90 38M150 38H200"/></g>'
-             '<g fill="#fff" stroke="#141412" stroke-width="1.3"><circle cx="24" cy="16" r="9"/><circle cx="24" cy="38" r="9"/><circle cx="24" cy="60" r="9"/></g>'
-             '<g font-size="9.5" font-weight="600" text-anchor="middle" fill="#141412"><text x="24" y="19.5">A</text><text x="24" y="41.5">B</text><text x="24" y="63.5">C</text></g>'
-             '<rect x="90" y="24" width="60" height="28" rx="8" fill="#141412"/><text x="120" y="42" font-size="10.5" font-weight="500" text-anchor="middle" fill="#fff">Same AI</text>'
-             '<rect x="200" y="24" width="36" height="28" rx="8" fill="#ff4b1f"/><path d="M210 38l5 5 11-11" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>')
+        s = ('<g stroke="var(--faint)" stroke-width="1.2" fill="none"><path d="M34 16L90 38M34 38H90M34 60L90 38M150 38H200"/></g>'
+             '<g fill="var(--card)" stroke="var(--ink)" stroke-width="1.3"><circle cx="24" cy="16" r="9"/><circle cx="24" cy="38" r="9"/><circle cx="24" cy="60" r="9"/></g>'
+             '<g font-size="9.5" font-weight="600" text-anchor="middle" fill="var(--ink)"><text x="24" y="19.5">A</text><text x="24" y="41.5">B</text><text x="24" y="63.5">C</text></g>'
+             '<rect x="90" y="24" width="60" height="28" rx="8" fill="var(--ink)"/><text x="120" y="42" font-size="10.5" font-weight="500" text-anchor="middle" fill="var(--on)">Same AI</text>'
+             '<rect x="200" y="24" width="36" height="28" rx="8" fill="var(--acc)"/><path d="M210 38l5 5 11-11" stroke="var(--on)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>')
         return f'<div class="viz"><svg viewBox="0 0 240 76" data-packets=\'{pk}\'>{s}</svg></div>'
     return ""
 
@@ -285,7 +285,7 @@ def b_flowcards(b):
     nodes, parts = b["nodes"], []
     for i, n in enumerate(nodes):
         if i:
-            parts.append('<div class="conn"><svg viewBox="0 0 28 12"><path class="flow" d="M0 6H26" stroke="#a9a9a2" fill="none" stroke-width="1.5"/><path d="M21 1l5 5-5 5" stroke="#a9a9a2" fill="none" stroke-width="1.5"/></svg></div>')
+            parts.append('<div class="conn"><svg viewBox="0 0 28 12"><path class="flow dashed" d="M0 6H26" stroke="var(--faint)" fill="none" stroke-width="1.5"/><path d="M21 1l5 5-5 5" stroke="var(--faint)" fill="none" stroke-width="1.5"/></svg></div>')
         subs = ""
         if n.get("subs"):
             subs = '<div class="sub3">' + "".join(f"<div><b>{rich(a)}</b>{rich(c)}</div>" for a, c in n["subs"]) + "</div>"
@@ -346,6 +346,86 @@ def b_cards(b):
 def b_html(b):
     return b["html"]
 
+
+# ---- geography: map block (Kazakhstan outline from Natural Earth, public domain) ----
+KZ_CITIES = {  # name: (lat, lon)
+    "Astana": (51.17, 71.45), "Almaty": (43.24, 76.89), "Shymkent": (42.32, 69.59), "Aktobe": (50.28, 57.21),
+    "Atyrau": (47.11, 51.92), "Aktau": (43.65, 51.17), "Karaganda": (49.80, 73.10), "Pavlodar": (52.29, 76.97),
+    "Kostanay": (53.21, 63.63), "Oskemen": (49.95, 82.61), "Kyzylorda": (44.85, 65.51), "Uralsk": (51.23, 51.37),
+    "Taraz": (42.90, 71.37), "Turkistan": (43.30, 68.25), "Semey": (50.41, 80.23), "Petropavl": (54.87, 69.15),
+    "Kokshetau": (53.28, 69.38), "Taldykorgan": (45.02, 78.37), "Zhezkazgan": (47.78, 67.77), "Baikonur": (45.62, 63.31),
+}
+
+def b_map(b):
+    """Map of Kazakhstan. points: [names] (built-in coordinates) or [{name,lat,lon}]; hq: name; arcs: "hub" or [[a,b],...];
+    labels: true|false or {name: left|right|top|bottom}; cycle: highlight cities in turn; graticule: true."""
+    g = json.loads(read(ASSETS / "geo" / "kz.json"))
+    proj = lambda lat, lon: (g["pad"] + (lon - g["lon0"]) * g["k"] * g["s"], g["pad"] + (g["lat1"] - lat) * g["s"])
+    pts = {}
+    for p in b.get("points", []):
+        n = p if isinstance(p, str) else p["name"]
+        lat, lon = KZ_CITIES[p] if isinstance(p, str) else (p["lat"], p["lon"])
+        pts[n] = proj(lat, lon)
+    hq = b.get("hq")
+    out = [f'<path class="mp-land" d="{g["path"]}"/>']
+    if b.get("graticule", True):
+        gr = []
+        for lon in range(50, 90, 10):
+            x, _ = proj(40, lon); gr.append(f"M{x:.0f} 0V{g['h']}")
+        for lat in range(42, 56, 4):
+            _, y = proj(lat, 50); gr.append(f"M0 {y:.0f}H{g['w']}")
+        out.insert(0, f'<path class="mp-grid" d="{"".join(gr)}"/>')
+    arcs = b.get("arcs")
+    pairs = [(hq, n) for n in pts if n != hq] if arcs == "hub" and hq else (arcs or [])
+    for i, (a, c) in enumerate(pairs):
+        (x1, y1), (x2, y2) = pts[a], pts[c]
+        mx, my = (x1 + x2) / 2, (y1 + y2) / 2
+        dx, dy = x2 - x1, y2 - y1
+        d = (dx * dx + dy * dy) ** .5 or 1
+        off = min(70, d * .22) * (1 if i % 2 else -1)
+        cx, cy = mx - dy / d * off, my + dx / d * off
+        out.append(f'<path class="mp-arc flow" data-per="{3.4 + (i % 5) * .7:.1f}" d="M{x1:.1f} {y1:.1f}Q{cx:.1f} {cy:.1f} {x2:.1f} {y2:.1f}"/>')
+    labels = b.get("labels", True)
+    city = []
+    for n, (x, y) in pts.items():
+        show = labels is True or isinstance(labels, dict) or (labels == "hq" and n == hq)
+        side = (labels.get(n) if isinstance(labels, dict) else ("top" if labels == "hq" else "right")) or "right"
+        tx, ty, anc = {"right": (x + 12, y + 4, "start"), "left": (x - 12, y + 4, "end"), "top": (x, y - 12, "middle"), "bottom": (x, y + 22, "middle")}[side]
+        lab = f'<text class="mp-lab" x="{tx:.1f}" y="{ty:.1f}" text-anchor="{anc}">{esc(n)}</text>' if show else ""
+        city.append(f'<g class="city{" hq" if n == hq else ""}"><circle class="ring" cx="{x:.1f}" cy="{y:.1f}" r="{9 if n == hq else 6}"/><circle class="pt" cx="{x:.1f}" cy="{y:.1f}" r="{5.5 if n == hq else 3.6}"/>{lab}</g>')
+    cyc = " data-cycle" if b.get("cycle") else ""
+    out.append(f'<g class="cities"{cyc}>{"".join(city)}</g>')
+    return f'<div class="map"><svg viewBox="0 0 {g["w"]} {g["h"]}" role="img" aria-label="Map of Kazakhstan">{"".join(out)}</svg></div>'
+
+def b_dial(b):
+    """Gauge with a needle that breathes. value 0..1 (illustrative), label under it."""
+    v = b.get("value", .6)
+    ticks = "".join(f'<path d="M{120 + 74*__import__("math").cos(__import__("math").radians(180+i*18)):.1f} {120 + 74*__import__("math").sin(__import__("math").radians(180+i*18)):.1f}L{120 + 82*__import__("math").cos(__import__("math").radians(180+i*18)):.1f} {120 + 82*__import__("math").sin(__import__("math").radians(180+i*18)):.1f}"/>' for i in range(11))
+    return (f'<div class="dialw"><svg class="dial" viewBox="0 0 240 150" data-v="{v}" data-amp="{b.get("amp", .08)}"><path class="d-bg" d="M30 120A90 90 0 0 1 210 120" pathLength="1"/>'
+            f'<path class="d-on" d="M30 120A90 90 0 0 1 210 120" pathLength="1" style="stroke-dasharray:1;stroke-dashoffset:{1-v:.3f}"/><g class="d-tk">{ticks}</g>'
+            f'<g class="needle" style="transform-origin:120px 120px;transform:rotate({-90+180*v:.1f}deg)"><path d="M120 120V44"/><circle cx="120" cy="120" r="6"/></g></svg>'
+            f'<div class="dl"><b>{rich(b.get("title",""))}</b><span>{rich(b.get("cap",""))}</span></div></div>')
+
+def b_iconwall(b):
+    n = len(b["items"])
+    its = []
+    for i in b["items"]:
+        icons = i["icons"] if isinstance(i.get("icons"), list) else [i["icon"]]
+        its.append(f'<div class="iwi"><morph-icon data-i="{icons[0]}"{" data-morph=%s" % chr(34) + ",".join(icons) + chr(34) if len(icons) > 1 else ""} size="38" stroke-width="1.4"></morph-icon><b>{rich(i["t"])}</b><span>{rich(i.get("d",""))}</span></div>')
+    return f'<div class="iw" style="--n:{b.get("cols", n)}">{"".join(its)}</div>'
+
+def b_morphline(b):
+    """A row of large icons that keep morphing into each other (use the custom Kazakhstan set or any icon)."""
+    icons = b["icons"]
+    els = []
+    for i, n in enumerate(icons):
+        rot = icons[i:] + icons[:i]
+        els.append(f'<morph-icon data-i="{n}" data-morph="{",".join(rot)}" size="{b.get("size", 34)}" stroke-width="1.4"></morph-icon>')
+    return f'<div class="mrow">{"".join(els)}</div>'
+
+def b_bigtype(b):
+    return f'<p class="bigtype kin">{kinetic(b["t"])}</p>'
+
 BLOCKS = {k[2:]: v for k, v in globals().items() if k.startswith("b_")}
 
 def render_block(b):
@@ -401,7 +481,8 @@ def chrome(i, total, s, deck, body, cls=""):
     foot_r = esc(s.get("foot_right", deck.get("footer_right", ", ".join(a.split()[-1] for a in deck.get("authors", [])))))
     active = " active" if i == 0 else ""
     cls = f"lay-{cls}" if cls else ""
-    return (f'<section class="slide {cls}{active}">{amb_html(s, deck)}{decor_html(s)}'
+    th = f' data-theme="{esc(s["theme"])}"' if s.get("theme") else ""
+    return (f'<section class="slide {cls}{active}"{th}>{amb_html(s, deck)}{decor_html(s)}'
             f'<div class="head"><span class="tag">{rich(s.get("tag", deck.get("tag","")))}</span><span>{i+1:02d} / {total:02d}</span></div>'
             f'<div class="body">{body}</div><div class="foot"><span>{foot_l}</span><span>{foot_r}</span></div></section>')
 
@@ -463,7 +544,7 @@ def L_compare(s, deck):
 
 def L_chart(s, deck):
     left = blocks(s.get("left"), 1)
-    return (f'{title_html(s)}<div class="lay" style="--cols:{s.get("cols","1fr 520px")}"><div class="col">{left}</div>'
+    return (f'{title_html(s)}<div class="lay" style="--cols:{s.get("cols","1fr 700px")}"><div class="col">{left}</div>'
             f'<div class="col rise" style="--d:2">{b_curve(s["chart"])}</div></div>{blocks(s.get("blocks"),3)}'), "chart"
 
 def L_closing(s, deck):
@@ -476,6 +557,32 @@ def L_closing(s, deck):
 def L_html(s, deck):
     return s["html"], "raw"
 
+
+def L_poster(s, deck):
+    """Big type on the left, art blocks on the right (map, hero, dial...)."""
+    sub = f'<p class="sub rise" style="--d:2;max-width:520px">{rich(s["sub"])}</p>' if s.get("sub") else ""
+    left = (f'<div class="eyebrow rise" style="--d:0">{rich(s.get("eyebrow",""))}</div><h1 class="poster-h kin rise" style="--d:1">{kinetic(s["title"])}</h1>{sub}{blocks(s.get("left"), 3)}')
+    art = blocks(s.get("art"), 2)
+    foot = f'<div class="rise" style="--d:6">{render_block({"type":"ticker","items":s["ticker"]})}</div>' if s.get("ticker") else ""
+    return f'<div class="poster" style="--cols:{s.get("cols","1fr 1fr")}"><div class="pl">{left}</div><div class="pr">{art}</div></div>{foot}', "poster"
+
+def L_history(s, deck):
+    ev = s["events"]
+    items = []
+    for i, e in enumerate(ev):
+        ic_ = f'<div class="msi">{ic(e.get("icon","check"), 22, 1.5)}</div>' if e.get("icon") else ""
+        items.append(f'<div class="ms-i" data-at="{(i + .5) / len(ev):.3f}"><div class="yr">{esc(str(e["year"]))}</div><div class="node"></div>{ic_}<h3>{rich(e["title"])}</h3><p>{rich(e.get("t",""))}</p></div>')
+    lead = f'<p class="lead rise" style="--d:1;max-width:540px;margin-top:10px">{rich(s["lead"])}</p>' if s.get("lead") else ""
+    return (f'{title_html(s)}{lead}<div class="hist rise" style="--d:2;--n:{len(ev)}"><div class="hl-line"></div><div class="ms" data-loop="{s.get("loop",14)}"><i class="ms-dot"></i>{"".join(items)}</div></div>'
+            f'{blocks(s.get("blocks"), 3)}'), "history"
+
+def L_spotlight(s, deck):
+    """Editorial two-column: left text (title, lead, blocks), right one large visual block (map, dial, iconwall, chart)."""
+    left = blocks(s.get("left"), 2)
+    right = blocks(s.get("right"), 1)
+    lead = f'<p class="lead rise" style="--d:1;margin:12px 0 18px">{rich(s["lead"])}</p>' if s.get("lead") else ""
+    return (f'<div class="spot" style="--cols:{s.get("cols","340px 1fr")}"><div class="col sl">{title_html(s)}{lead}{left}</div><div class="col sr">{right}</div></div>'), "spotlight"
+
 LAYOUTS = {k[2:]: v for k, v in globals().items() if k.startswith("L_")}
 
 # ----------------------------------------------------------------- pages
@@ -484,12 +591,13 @@ def read(p): return Path(p).read_text(encoding="utf-8")
 def head_html(deck, slug, css_href="../engine/theme.css"):
     acc = deck.get("accent")
     accv = f'<style>:root{{--acc:{acc};--acc-soft:{acc}18}}</style>' if acc else ""
-    return (f'<!DOCTYPE html><html lang="{deck.get("lang","en")}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+    th = f' data-theme="{esc(deck["theme"])}"' if deck.get("theme") else ""
+    return (f'<!DOCTYPE html><html lang="{deck.get("lang","en")}"{th}><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
             f'<title>{esc(deck["title"])}</title><meta name="description" content="{esc(deck.get("subtitle",""))}">'
             f'<link rel="preload" href="../fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="{css_href}">{accv}</head><body>')
 
 def known_icons():
-    return set(re.findall(r"export const (\w+)", read(ASSETS / "vendor" / "icons.js")))
+    return set(re.findall(r"export const (\w+)", read(ASSETS / "vendor" / "icons.js") + read(ASSETS / "vendor" / "icons.custom.js")))
 
 def check_icons(slug, h):
     names = set(re.findall(r'data-i="(\w+)"', h))
@@ -515,7 +623,7 @@ def render_deck(slug, deck):
     pdf = deck.get("pdf") or f"{slug}.pdf"
     exp = ""
     if (DECKS / slug / pdf).exists():
-        exp = f'<a class="export" id="exp" href="{esc(pdf)}" download>{ic("download")}<span>Download PDF</span></a>'
+        exp = f'<a class="export" id="exp" href="{esc(pdf)}" download title="Download PDF" aria-label="Download PDF">{ic("download")}<span>Download PDF</span></a>'
     ui = (f'<div class="ui"><button class="nav" id="prev" aria-label="Previous slide">{ic("arrowLeft")}</button><div class="dots" id="dots"></div>'
           f'<button class="nav" id="next" aria-label="Next slide">{ic("arrowRight")}</button></div>')
     cfg = json.dumps(deck.get("motion", {}))
@@ -535,8 +643,13 @@ def slide_titles_from_html(h):
 
 def inject_legacy(h):
     h = h.replace("</body>", '<script src="../engine/remote.js" defer></script></body>')
-    h = h.replace("</head>", "<style>.thumb .ui,.thumb .export,.thumb .rbtn,.thumb .rpop{display:none!important}</style>"
-                  "<script>if(/[?&]thumb/.test(location.search))document.documentElement.classList.add('thumb')</script></head>", 1)
+    h = h.replace("</head>", "<style>.thumb .ui,.thumb .export,.thumb .rbtn,.thumb .rpop{display:none!important}"
+                  ".head .tag::before{display:none!important}"
+                  ".export{top:14px!important;right:14px!important;width:30px;height:30px;padding:0!important;gap:0!important;justify-content:center;border-radius:50%!important;background:var(--card)!important;color:var(--mute)!important;border:1px solid var(--line)!important;opacity:.8;box-shadow:none!important;font-size:0!important}"
+                  ".export span{display:none}.export:hover{background:var(--ink)!important;color:var(--on)!important;border-color:var(--ink)!important;opacity:1}.export svg{width:14px!important;height:14px!important}"
+                  ".ui,.export,.rbtn{transition:opacity .45s ease,background .2s,border-color .2s,color .2s}"
+                  "@media (hover:hover){html.idle .ui,html.idle .export,html.idle .rbtn{opacity:0;pointer-events:none}html.idle{cursor:none}}</style>"
+                  "<script>if(/[?&]thumb/.test(location.search))document.documentElement.classList.add('thumb');addEventListener('DOMContentLoaded',function(){var e=document.getElementById('exp');if(e){e.title='Download PDF';e.setAttribute('aria-label','Download PDF')}})</script></head>", 1)
     return h
 
 def build(quiet=False):
@@ -546,6 +659,9 @@ def build(quiet=False):
         shutil.rmtree(tmp)
     (tmp / "engine").mkdir(parents=True)
     shutil.copytree(ASSETS / "vendor", tmp / "vendor")
+    (tmp / "vendor" / "icons.js").write_text(read(ASSETS / "vendor" / "icons.js") + "\n" + read(ASSETS / "vendor" / "icons.custom.js"), encoding="utf-8")
+    (tmp / "vendor" / "icons.custom.js").unlink()
+    shutil.copytree(ASSETS / "geo", tmp / "geo")
     shutil.copytree(ASSETS / "fonts", tmp / "fonts")
     (tmp / "engine" / "theme.css").write_text(read(ENGINE / "theme.base.css") + "\n" + read(ENGINE / "theme.add.css"), encoding="utf-8")
     for f in ("motion.js", "remote.js"):

@@ -6,6 +6,7 @@
   "tags": ["Tools", "Motion"],
   "minutes": 3,
   "tag": "Deckforge",
+  "theme": "sand",
   "footer": "Showcase deck",
   "footer_right": "deckforge",
   "motion": {"intensity": 1, "speed": 1},

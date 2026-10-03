@@ -1,4 +1,4 @@
-# deckforge
+# deckforge (site name: Perricheno Presentation)
 
 Presentations as data. `decks/<slug>/deck.json` -> engine builds a site with looped motion graphics, PDF export, a phone remote (PIN + SSE) and a gallery. Live at https://x.perricheno.com (service `deckforge`, port 8191, Cloudflare tunnel; nothing is cached).
 
