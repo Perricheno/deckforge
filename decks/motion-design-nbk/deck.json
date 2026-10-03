@@ -394,6 +394,53 @@
   {
    "layout": "scene",
    "chrome": false,
+   "theme": "nbk",
+   "bg": "grid",
+   "bg_opts": {
+    "alpha": 0.35
+   },
+   "loop": 18,
+   "poster": 14,
+   "layers": [
+    {
+     "type": "text",
+     "t": "MONETARY POLICY IN ACTION",
+     "x": 84,
+     "y": 50,
+     "size": 13,
+     "weight": 500,
+     "spacing": 0.16,
+     "color": "mute",
+     "in": "fade",
+     "at": 0.2
+    },
+    {
+     "type": "text",
+     "t": "The same economy, ^^four moments^^",
+     "x": 80,
+     "y": 72,
+     "size": 46,
+     "split": "words",
+     "in": "mask",
+     "at": 0.3,
+     "stagger": 0.1
+    },
+    {
+     "type": "custom",
+     "id": "economy",
+     "x": 50,
+     "y": 150,
+     "w": 1180,
+     "h": 520,
+     "in": "fade",
+     "at": 1.0,
+     "dur": 1.0
+    }
+   ]
+  },
+  {
+   "layout": "scene",
+   "chrome": false,
    "theme": "nbk-dark",
    "bg": "particles",
    "bg_opts": {

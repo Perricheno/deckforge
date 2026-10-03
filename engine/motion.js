@@ -408,6 +408,24 @@ register('erosion',{selector:'svg.erosion',
   still(svg){const y=+svg.dataset.years||10;svg.querySelector('.er-y').textContent='Year '+y;svg.querySelector('.er-mk').setAttribute('cx',410);
     svg.querySelectorAll('.er-c').forEach(g=>{const rate=+g.dataset.rate,v=100/Math.pow(1+rate/100,y),r=96*Math.sqrt(v/100),cx=+g.dataset.cx;g.querySelector('.er-coin').setAttribute('r',r);g.querySelector('.er-g').setAttribute('transform',`translate(${cx} 140) scale(${Math.max(.25,r/96)})`);g.querySelector('.er-v').textContent=Math.round(v)})}});
 
+/* custom visuals: write ANY code for a slide (canvas, SVG, WebGL, thousands of lines) in the deck's plugin files:
+   DeckMotion.custom('economy', (el, api) => { ...build DOM inside el...; return (t, dt, st) => { ...draw frame... } })
+   el = the container (w x h from the deck), api = engine helpers, t = global seconds, st = seconds since this slide opened (0..loop).
+   api.STATIC is true for PDF/reduced motion: draw one finished still frame instead of looping. */
+const customs={};
+function custom(name,fn){customs[name]=fn;if(window.__deckBooted)bootCustom(name)}
+function bootCustom(only){
+  for(const el of $('.custom[data-custom]')){
+    const name=el.dataset.custom;if(only&&name!==only||el.__cu)continue;const fn=customs[name];if(!fn)continue;el.__cu=1;
+    const o=opts(el);const sc=el.closest('.scene'),i=slideOf(el);
+    const st=()=>{const c=sc&&sceneClock.get(sc);return c?((performance.now()-c.t0)/1000)%c.loop:0};
+    const upd=fn(el,{...api,opts:o,sceneTime:st,slide:i,poster:sc?+sc.dataset.poster:5});
+    if(typeof upd==='function'){if(STATIC){upd(0,0,sc?+sc.dataset.poster:5)}else frame.push({slide:i,fn:(t,dt)=>upd(t,dt,st())})}
+  }
+}
+window.DeckMotion.custom=custom;
+document.addEventListener('deckmotion:plugins',()=>bootCustom());
+
 /* ── frame loop ────────────────────────────────────────────────────────── */
 boot(Object.values(behaviors));
 window.__deckBooted=true;
@@ -416,5 +434,6 @@ let last=0;
 
 /* per-deck plugin hook: decks/<slug>/plugin.js runs after this module */
 document.dispatchEvent(new CustomEvent('deckmotion:ready',{detail:window.DeckMotion}));
+addEventListener('load',()=>bootCustom());
 go((parseInt(location.hash.slice(1))||1)-1);
 window.__ready=true;

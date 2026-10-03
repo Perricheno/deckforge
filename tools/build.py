@@ -425,6 +425,11 @@ def b_morphline(b):
         els.append(f'<morph-icon data-i="{n}" data-morph="{",".join(rot)}" size="{b.get("size", 34)}" stroke-width="1.4"></morph-icon>')
     return f'<div class="mrow">{"".join(els)}</div>'
 
+def b_custom(b):
+    """Same container as the custom scene layer, for use inside any layout."""
+    opts = esc(json.dumps(b.get("opts", {})))
+    return f'<div class="custom" data-custom="{esc(b["id"])}" data-opts="{opts}" style="width:{b.get("w",640)}px;height:{b.get("h",360)}px"></div>'
+
 def b_bigtype(b):
     return f'<p class="bigtype kin">{kinetic(b["t"])}</p>'
 
@@ -771,7 +776,13 @@ def ly_counter(l):
           f'{pre}<span class="cnv">{l.get("from",0)}</span>{suf}</span>')
     return _ly(l, el, st, "ly-counter")
 
-LAYER_TYPES = {"text": ly_text, "shape": ly_shape, "widget": ly_widget, "icon": ly_icon, "counter": ly_counter}
+def ly_custom(l):
+    """Container for hand-written visual code: DeckMotion.custom("name", (el, api) => update) in the deck's plugin files."""
+    opts = esc(json.dumps(l.get("opts", {})))
+    st = f'width:{l.get("w",1280)}px;height:{l.get("h",720)}px;'
+    return _ly(l, f'<div class="custom" data-custom="{esc(l["id"])}" data-opts="{opts}" style="{st}"></div>', "", "ly-custom")
+
+LAYER_TYPES = {"custom": ly_custom, "text": ly_text, "shape": ly_shape, "widget": ly_widget, "icon": ly_icon, "counter": ly_counter}
 
 def L_scene(s, deck):
     """layers:[{type:text|shape|widget|icon|counter, x,y,anchor, at,out,in,outAnim,dur,stagger, anim:[keys], loop:"float:amp=6"}],
@@ -791,13 +802,13 @@ LAYOUTS = {k[2:]: v for k, v in globals().items() if k.startswith("L_")}
 # ----------------------------------------------------------------- pages
 def read(p): return Path(p).read_text(encoding="utf-8")
 
-def head_html(deck, slug, css_href="../engine/theme.css"):
+def head_html(deck, slug, css_href="../engine/theme.css", extra_head=""):
     acc = deck.get("accent")
     accv = f'<style>:root{{--acc:{acc};--acc-soft:{acc}18}}</style>' if acc else ""
     th = f' data-theme="{esc(deck["theme"])}"' if deck.get("theme") else ""
     return (f'<!DOCTYPE html><html lang="{deck.get("lang","en")}"{th}><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
             f'<title>{esc(deck["title"])}</title><meta name="description" content="{esc(deck.get("subtitle",""))}">'
-            f'<link rel="preload" href="../fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="{css_href}">{accv}</head><body>')
+            f'<link rel="preload" href="../fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="{css_href}">{accv}{extra_head}</head><body>')
 
 def known_icons():
     return set(re.findall(r"export const (\w+)", read(ASSETS / "vendor" / "icons.js") + read(ASSETS / "vendor" / "icons.custom.js")))
@@ -830,8 +841,11 @@ def render_deck(slug, deck):
     ui = (f'<div class="ui"><button class="nav" id="prev" aria-label="Previous slide">{ic("arrowLeft")}</button><div class="dots" id="dots"></div>'
           f'<button class="nav" id="next" aria-label="Next slide">{ic("arrowRight")}</button></div>')
     cfg = json.dumps(deck.get("motion", {}))
-    plug = '<script type="module" src="plugin.js"></script>' if (DECKS / slug / "plugin.js").exists() else ""
-    return (head_html(deck, slug) + exp + f'<div id="viewport"><main id="deck">{"".join(secs)}</main></div>' + ui +
+    d_ = DECKS / slug
+    mods = (["plugin.js"] if (d_ / "plugin.js").exists() else []) + sorted(f"plugins/{f.name}" for f in (d_ / "plugins").glob("*.js")) if d_.exists() else []
+    plug = "".join(f'<script type="module" src="{m}"></script>' for m in mods)
+    css_extra = '<link rel="stylesheet" href="style.css">' if (d_ / "style.css").exists() else ""
+    return (head_html(deck, slug, extra_head=css_extra) + exp + f'<div id="viewport"><main id="deck">{"".join(secs)}</main></div>' + ui +
             f'<script type="application/json" id="deck-config">{cfg}</script>'
             '<script type="module" src="../engine/motion.js"></script>' + plug + '<script src="../engine/remote.js" defer></script></body></html>')
 
@@ -887,8 +901,12 @@ def build(quiet=False):
             check_icons(slug, h)
             titles = slide_titles_from_html(h)
             (out / "index.html").write_text(h, encoding="utf-8")
-        if (d / "plugin.js").exists():
-            shutil.copy(d / "plugin.js", out / "plugin.js")
+        for f in ("plugin.js", "style.css"):
+            if (d / f).exists():
+                shutil.copy(d / f, out / f)
+        for sub in ("plugins", "assets"):
+            if (d / sub).is_dir():
+                shutil.copytree(d / sub, out / sub)
         pdf = deck.get("pdf") or f"{slug}.pdf"
         has_pdf = (d / pdf).exists()
         if has_pdf:

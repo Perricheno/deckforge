@@ -37,6 +37,18 @@ Common layer fields: `type`, `x`,`y` (px, top-left; `anchor`: tl tc tr cl c cr b
 - `icon`: `name`, `size`, `sw`, `color`, `seq:[{at,to}]` morphs through icons on the timeline. `counter`: `from`,`to`,`at`,`cdur`,`dec`,`prefix`,`suffix`,`size`,`color`.
 **Storyboard recipe** (what a good scene does): 0-1 s eyebrow fades in; 0.3-2 s headline rises word by word (`mask`); 2-3 s a rule wipes in and the sub-line fades; 3-6 s the visual (map/chart/diagram) draws on and starts its own loop; last 0.6 s everything fades so the loop restarts cleanly. Tell one idea per scene with a visual that *explains* it (a signal crossing a country, a lag between a decision and prices, a payment travelling through banks, coins losing value year by year), not a grid of icons.
 
+## Custom code visuals (no ceiling)
+Scene layer: `{"type":"custom","id":"economy","x":50,"y":150,"w":1180,"h":520,"in":"fade","at":1}`; block form `{"type":"custom","id":"…","w":640,"h":360,"opts":{…}}` works in any layout.
+Extra files per deck (all copied to the site): `plugin.js`, `plugins/*.js` (ES modules loaded in order after the engine), `style.css`, `assets/` (images, data, fonts, shaders…, referenced relatively).
+```js
+const DM = window.DeckMotion;
+DM.custom('economy', (el, api) => {            // el: the container (w x h), api: helpers + api.opts (from "opts")
+  const cv = document.createElement('canvas'); cv.width = 2360; cv.height = 1040; el.appendChild(cv);   // any DOM/canvas/SVG/WebGL you like
+  return (t, dt, st) => { /* t: global seconds, dt: frame delta, st: seconds since this slide opened (0..loop) */ };
+});
+```
+`api` also has `STATIC` (draw a finished still: PDF/reduced motion), `poster` (still frame time), `sceneTime()`, `rand`, `ease`, `clamp`, `lerp`, `ACC`, `INK`, `I` (icons). Read theme colours with `getComputedStyle(el).getPropertyValue('--acc')` (`--ink --mute --faint --line --card --tint --on`). Bring your own models, maths and data; label illustrative numbers.
+
 ## Storytelling widgets
 - `map {…, signal:true, label_size}`: waves leave the HQ and light each city on arrival. · `lags {rows:[{t,d,kind:"step"|"rise"|"fall",delay,tau,acc?}], shock?, shock_label, ticks?, loop, cap}`: impulse response; a cursor sweeps time and each row lights up when it reacts. · `journey {nodes:[{kind:"phone"|"bank"|"nbk"|"shop",t,d}], go, back}`: a request travels out and the confirmation returns. · `erosion {rates:[5,10], years, loop, cap}`: coins shrink year by year (exact arithmetic 100/(1+r)^y). · `baiterek {}`: line illustration with a slow sun.
 
