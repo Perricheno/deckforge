@@ -19,4 +19,9 @@
 [data-theme="netflix"] .lay-compare .tile{font-size:15px;min-width:0}
 [data-theme="netflix"] .tile.out{background:#e50914;border-color:#ff3540;color:#fff}
 [data-theme="netflix"] .tile.out .ico{background:#fff;color:#e50914}
+[data-theme="netflix"] h2.kin .wi{transform:none!important;animation:none!important}
+[data-theme="netflix"] .joint{background:#1b1b1b!important;color:#fff!important;border:1px solid rgba(255,255,255,.14)}
+[data-theme="netflix"] .joint .b{background:#2b2b2b!important;color:#fff!important}
+[data-theme="netflix"] .joint .b.o{background:#e50914!important}
+[data-theme="netflix"] .joint .arr{color:#e0e0da!important}
 @media print{[data-theme="netflix"] .slide::after{animation:none;opacity:.35}}
