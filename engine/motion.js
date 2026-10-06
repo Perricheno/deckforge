@@ -25,7 +25,12 @@ const PDF=Q.has('pdf'),THUMB=Q.has('thumb');
 const cfgEl=document.getElementById('deck-config');
 const config=Object.assign({speed:1,intensity:1,seed:null,reduce:'respect',scenes:{}},cfgEl?JSON.parse(cfgEl.textContent):{});
 const REDUCE=config.reduce!=='ignore'&&matchMedia('(prefers-reduced-motion: reduce)').matches;
-const STATIC=PDF||REDUCE;
+// iOS in-app browsers have a tight canvas/GPU budget. A deck with many hidden
+// 2560×1440 canvases can be killed when the viewer changes slide. Keep the
+// storytelling, but render a single inexpensive still background on touch-size
+// screens; desktop and presenter displays retain the full motion treatment.
+const LOW_POWER=!PDF&&!THUMB&&matchMedia('(max-width:900px), (pointer:coarse)').matches;
+const STATIC=PDF||REDUCE||LOW_POWER;
 const NS='http://www.w3.org/2000/svg';
 const ACC='var(--acc)',INK='var(--ink)';                     // SVG attributes (theme aware)
 const cvar=(el,v)=>getComputedStyle(el).getPropertyValue(v).trim();
@@ -33,6 +38,15 @@ const rgbOf=hex=>{const h=hex.replace('#','');const n=parseInt(h.length===3?h.re
 
 /* ── utilities ─────────────────────────────────────────────────────────── */
 const $=(s,r=document)=>[...r.querySelectorAll(s)];
+if(LOW_POWER){
+  document.documentElement.dataset.lowPower='1';
+  // 640×360 uses 0.9 MB per ambient canvas rather than 14.1 MB at retina size.
+  // CSS still scales it to the exact slide size; ambient backgrounds are soft by design.
+  $('canvas.amb').forEach(cv=>{cv.width=640;cv.height=360});
+  const st=document.createElement('style');
+  st.textContent='[data-low-power="1"] .slide::after{animation:none!important;filter:none!important;opacity:.28!important}';
+  document.head.appendChild(st);
+}
 let _seed=config.seed==null?null:(config.seed>>>0);
 const rand=()=>{if(_seed==null)return Math.random();_seed|=0;_seed=_seed+0x6D2B79F5|0;let t=Math.imul(_seed^_seed>>>15,1|_seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
 const rnd=(a,b)=>a+rand()*(b-a);
@@ -168,7 +182,7 @@ scene('steppe',(c,t,w,h,o)=>{
 
 /* ── behaviors ─────────────────────────────────────────────────────────── */
 register('ambient',{selector:'canvas.amb',always:true,
-  setup(cv,A){const ctx=cv.getContext('2d'),name=str(cv,'amb','aurora'),o=Object.assign({color:cvar(cv,'--acc'),ink:rgbOf(cvar(cv,'--ink'))},config.scenes[name],opts(cv)),w=1280,h=720;ctx.setTransform(2,0,0,2,0,0);
+  setup(cv,A){const ctx=cv.getContext('2d'),name=str(cv,'amb','aurora'),o=Object.assign({color:cvar(cv,'--acc'),ink:rgbOf(cvar(cv,'--ink'))},config.scenes[name],opts(cv)),w=1280,h=720;ctx.setTransform(cv.width/w,0,0,cv.height/h,0,0);
     const fn=()=>(scenes[name]||scenes.aurora);
     if(A.STATIC){fn()(ctx,4.2,w,h,o);return}
     fn()(ctx,0,w,h,o);return t=>fn()(ctx,t,w,h,o)}});
