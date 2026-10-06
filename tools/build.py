@@ -843,11 +843,14 @@ def render_deck(slug, deck):
     cfg = json.dumps(deck.get("motion", {}))
     d_ = DECKS / slug
     mods = (["plugin.js"] if (d_ / "plugin.js").exists() else []) + sorted(f"plugins/{f.name}" for f in (d_ / "plugins").glob("*.js")) if d_.exists() else []
-    plug = "".join(f'<script type="module" src="{m}"></script>' for m in mods)
-    css_extra = '<link rel="stylesheet" href="style.css">' if (d_ / "style.css").exists() else ""
-    return (head_html(deck, slug, extra_head=css_extra) + exp + f'<div id="viewport"><main id="deck">{"".join(secs)}</main></div>' + ui +
+    # Versioned URLs let a viewer receive an emergency renderer fix immediately
+    # even when CSS/JS has a short browser/CDN cache lifetime.
+    ver = int((ENGINE / "motion.js").stat().st_mtime)
+    plug = "".join(f'<script type="module" src="{m}?v={int((d_ / m).stat().st_mtime)}"></script>' for m in mods)
+    css_extra = f'<link rel="stylesheet" href="style.css?v={int((d_ / "style.css").stat().st_mtime)}">' if (d_ / "style.css").exists() else ""
+    return (head_html(deck, slug, css_href=f"../engine/theme.css?v={int((ENGINE / 'theme.base.css').stat().st_mtime)}", extra_head=css_extra) + exp + f'<div id="viewport"><main id="deck">{"".join(secs)}</main></div>' + ui +
             f'<script type="application/json" id="deck-config">{cfg}</script>'
-            '<script type="module" src="../engine/motion.js"></script>' + plug + '<script src="../engine/remote.js" defer></script></body></html>')
+            f'<script type="module" src="../engine/motion.js?v={ver}"></script>' + plug + f'<script src="../engine/remote.js?v={int((ENGINE / "remote.js").stat().st_mtime)}" defer></script></body></html>')
 
 def slide_titles_from_html(h):
     out = []
