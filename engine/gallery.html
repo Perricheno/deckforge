@@ -45,6 +45,7 @@ header.s{border-color:var(--line)}
 .card:hover,.card:focus-visible{transform:translateY(-4px);box-shadow:0 26px 50px -30px rgba(20,20,18,.45);border-color:#cfcfc8}
 .card:focus-visible{border-color:var(--ink)}
 .th{position:relative;aspect-ratio:16/9;background:var(--tint);overflow:hidden;border-bottom:1px solid var(--line)}
+.th::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 76% 28%,rgba(229,9,20,.22),transparent 28%),linear-gradient(135deg,#1b1b19,#30302c 55%,#171716);opacity:.9}
 .th iframe{position:absolute;left:0;top:0;width:1280px;height:720px;border:0;transform-origin:0 0;pointer-events:none;opacity:0;transition:opacity .5s}
 .th iframe.ok{opacity:1}
 .th .n{position:absolute;right:10px;bottom:10px;padding:3px 9px;border-radius:99px;background:rgba(20,20,18,.78);color:#fff;font-size:11px;font-weight:500;backdrop-filter:blur(6px)}
@@ -65,6 +66,9 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .sk{height:300px;border-radius:18px;background:linear-gradient(100deg,var(--tint) 30%,#f8f8f4 50%,var(--tint) 70%);background-size:300% 100%;animation:sk 1.4s infinite}
 @keyframes sk{to{background-position:-300% 0}}
 @media (max-width:560px){.wrap{width:calc(100% - 32px)}.grid{grid-template-columns:1fr}.hero{padding-top:28px}.search kbd{display:none}.count{width:100%;margin:0}}
+/* A full deck is a sizeable animated application. Never boot several of them
+   inside a phone gallery: the static poster keeps the homepage fast and stable. */
+@media (max-width:767px){.th iframe{display:none}.card{animation:none}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -117,6 +121,13 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
   }
   /* live thumbnails: scale to the card, load when visible, flip through slides on hover */
   function thumbs(){
+    var canRunPreviews=!matchMedia('(max-width:767px), (prefers-reduced-motion: reduce)').matches;
+    if(!canRunPreviews){
+      [].forEach.call(grid.querySelectorAll('.card'),function(card){
+        card.addEventListener('keydown',function(e){if(e.key==='Enter')location.href='/'+card.dataset.s+'/'});
+      });
+      return;
+    }
     var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){var f=e.target.querySelector('iframe');if(f&&!f.src){f.src=f.dataset.src;f.onload=function(){f.classList.add('ok')}}io.unobserve(e.target)}})},{rootMargin:'200px'});
     [].forEach.call(grid.querySelectorAll('.card'),function(card){
       var th=card.querySelector('.th'),f=th.querySelector('iframe'),n=+card.dataset.n,tm=null,k=0;

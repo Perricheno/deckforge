@@ -33,6 +33,19 @@ NO_CACHE = {
     "CDN-Cache-Control": "no-store", "Cloudflare-CDN-Cache-Control": "no-store",
 }
 
+# HTML and deck metadata need to update immediately.  Large immutable assets
+# should not be downloaded again whenever someone returns to the gallery.
+ASSET_CACHE = {
+    "Cache-Control": "public, max-age=604800, immutable",
+    "CDN-Cache-Control": "public, max-age=604800, immutable",
+    "Cloudflare-CDN-Cache-Control": "public, max-age=604800, immutable",
+}
+SHORT_CACHE = {
+    "Cache-Control": "public, max-age=300",
+    "CDN-Cache-Control": "public, max-age=300",
+    "Cloudflare-CDN-Cache-Control": "public, max-age=300",
+}
+
 # ------------------------------------------------------------------ auth
 def _secret():
     f = DATA / "secret.key"
@@ -246,7 +259,16 @@ class H(BaseHTTPRequestHandler):
         ctype = mimetypes.guess_type(str(f))[0] or "application/octet-stream"
         if f.suffix in (".html", ".css", ".js", ".json", ".md"): ctype += "; charset=utf-8"
         if f.suffix == ".js": ctype = "text/javascript; charset=utf-8"
-        self.send(200, f.read_bytes(), ctype)
+        # Keep navigational documents fresh, but cache assets.  This avoids
+        # repeated 10–20 MB PDF/font/image transfers and markedly reduces
+        # mobile CPU/network pressure when opening the site again.
+        if f.suffix.lower() in (".woff", ".woff2", ".png", ".jpg", ".jpeg", ".webp", ".svg"):
+            extra = ASSET_CACHE
+        elif f.suffix.lower() in (".css", ".js", ".pdf"):
+            extra = SHORT_CACHE
+        else:
+            extra = None
+        self.send(200, f.read_bytes(), ctype, extra=extra)
 
     def api_get(self, p, q):
         parts = p.split("/")
