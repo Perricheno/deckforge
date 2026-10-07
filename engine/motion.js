@@ -44,7 +44,7 @@ if(LOW_POWER){
   // CSS still scales it to the exact slide size; ambient backgrounds are soft by design.
   $('canvas.amb').forEach(cv=>{cv.width=640;cv.height=360});
   const st=document.createElement('style');
-  st.textContent='[data-low-power="1"] *,[data-low-power="1"] *::before,[data-low-power="1"] *::after{animation:none!important;transition:none!important}[data-low-power="1"] .slide::after{filter:none!important;opacity:.28!important}';
+  st.textContent='[data-low-power="1"] *,[data-low-power="1"] *::before,[data-low-power="1"] *::after{animation:none!important;transition:none!important}[data-low-power="1"] .slide{transform:none!important;transition:opacity .38s cubic-bezier(.2,.75,.2,1),visibility .38s!important}[data-low-power="1"] .slide::after{filter:none!important;opacity:.28!important}';
   document.head.appendChild(st);
 }
 let _seed=config.seed==null?null:(config.seed>>>0);
